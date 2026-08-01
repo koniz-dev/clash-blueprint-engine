@@ -23,32 +23,38 @@ apps/web (Next.js, client shell)
   lib/data.ts         builds catalog + rule set from data/*.json via the rules-engine parsers
 
 @clash/ui (React binding + components)
-  useEditor.ts        THE binding — owns one VillageEditor, subscribes to CommandStack + EventStore
+  useEditor.ts        THE binding — owns one VillageEditor and composes the hooks below
+  hooks/              focused hooks: useSelection, useClipboard, useQueries, useReplay,
+                      useKeyboardShortcuts, usePersistence, useHelp, useDiscardGuard, useEngineBinding, useLog
   EditorCanvas.tsx    Konva view over controller.scene; turns pointer input into controller actions
   Toolbar / BuildingLibrary / Panels   presentational, read controller state, call controller actions
   EditorApp.tsx       composition only
 ```
 
-### `useEditor` — the whole integration in one hook
+### `useEditor` — the composition root
 
 ```ts
-const controller = useEditor({ catalog, ruleSet, gridSize: 44, townHall: 8 });
+const controller = useEditor({ catalog, ruleSet, gridSize: 44, tier: 8 });
 ```
 
-It owns a single `VillageEditor` and:
+It owns a single `VillageEditor` and **composes focused hooks** (each in
+`@clash/ui`'s `hooks/`) into one controller — no single "God hook":
 
-- **Re-renders on domain change** by subscribing to `editor.history.onChanged`
-  and `editor.events.onAppended` — the view can never drift from the domain.
-- **Dispatches, never decides.** Every action (`placeBuilding`, `addWall`,
-  `rotateSelected`, `undo`, …) calls a facade method and surfaces any
-  `EngineError` to the log. The hook contains no rules, no geometry, no scoring.
-- **Derives the view** with `buildScene(editor.village, catalog)`, memoized on a
-  version counter bumped by the subscriptions.
-- **Runs queries on demand** — `runValidation` (rules-engine), `runAnalysis`
-  (analyzer), `runAi` (ai) — storing their reports in React state for the panels.
+- **`useEngineBinding`** subscribes to `editor.history.onChanged` /
+  `editor.events.onAppended`, bumping a `version` counter (which the `scene` memo
+  keys on) so the view can never drift from the domain; `rebind` re-subscribes
+  after a `load` swaps the stores.
+- **`useSelection`** tracks the entity-agnostic selection (buildings **and**
+  walls) and splits it by kind for the command layer.
+- **`useClipboard`**, **`useReplay`**, **`useHelp`**, **`useDiscardGuard`** own
+  their slices; **`useQueries`** runs `runValidation` / `runAnalysis` / `runAi`
+  on demand into panel state; **`useKeyboardShortcuts`** dispatches from the
+  `shortcuts.ts` registry; **`usePersistence`** does versioned autosave/restore.
+- **Dispatches, never decides.** Every action calls a facade method and surfaces
+  any `EngineError` to the log — no rules, geometry, or scoring in React.
 
-Because the binding is this thin, the same engine could be driven by a Vue or
-Svelte hook, a CLI, or tests with no change to the core.
+Because the binding is this thin and modular, the same engine could be driven by
+a Vue or Svelte hook, a CLI, or tests with no change to the core.
 
 ## Features
 
