@@ -100,8 +100,13 @@ a Vue or Svelte hook, a CLI, or tests with no change to the core.
 - **Toolbar**: New, Open, Undo, Redo, Validate, Analyze, AI Suggest, Export JSON
   / ASCII / **PNG** (retina 2×; the SVG render rasterized to a canvas).
 - **Left panel**: building library grouped by category.
+- **Undo-history panel**: a read-only projection of the engine's command stack
+  (`CommandStack.entries`) — applied commands oldest→newest with the current
+  state marked, undone commands dimmed. Click any row to **jump** to that point
+  (the panel issues the right number of undo/redo commands via the facade; it
+  holds no history state of its own).
 - **Right panel**: Inspector (rotate / copy / delete; a multi-select summary),
-  Attack Replay controls, Statistics, Validation results, Defense Score with
+  History, Attack Replay controls, Statistics, Validation results, Defense Score with
   per-metric bars, and ranked AI suggestions — each "move" suggestion has an
   **Apply** button that runs the move as a command (so it's undoable).
 - **Bottom panel**: a live log of engine events and errors — the `EventStore`

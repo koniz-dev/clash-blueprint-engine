@@ -215,6 +215,27 @@ describe("VillageEditor batch operations", () => {
   });
 });
 
+describe("CommandStack history entries", () => {
+  it("projects applied and undone commands as labels", () => {
+    const editor = makeEditor();
+    editor.addBuilding("cannon", { x: 10, y: 10 });
+    editor.addWall({ x: 0, y: 0 });
+
+    // Two applied commands, oldest → newest; nothing to redo yet.
+    expect(editor.history.entries).toEqual({
+      undo: ["Add building", "Add wall"],
+      redo: [],
+    });
+
+    editor.undo();
+    // The undone command moves to redo (next-to-redo first).
+    expect(editor.history.entries).toEqual({
+      undo: ["Add building"],
+      redo: ["Add wall"],
+    });
+  });
+});
+
 describe("VillageEditor persistence", () => {
   it("saves and loads a snapshot", () => {
     const editor = makeEditor();

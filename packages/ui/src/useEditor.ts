@@ -207,6 +207,15 @@ export function useEditor(options: UseEditorOptions) {
   const undo = useCallback(() => editor.undo(), [editor]);
   const redo = useCallback(() => editor.redo(), [editor]);
 
+  /** Step through history: negative = undo N times, positive = redo N times. */
+  const jumpHistory = useCallback(
+    (steps: number) => {
+      for (let i = 0; i < -steps; i += 1) editor.undo();
+      for (let i = 0; i < steps; i += 1) editor.redo();
+    },
+    [editor],
+  );
+
   // --- Load / import orchestration ----------------------------------------
 
   // Called after `editor.load`: re-bind subscriptions to the new stores, rebuild
@@ -345,6 +354,9 @@ export function useEditor(options: UseEditorOptions) {
     aiLoading: queries.aiLoading,
     canUndo: editor.history.canUndo,
     canRedo: editor.history.canRedo,
+    // Read-only history projection for the history panel (re-read each render,
+    // which happens on every command via the version bump).
+    history: editor.history.entries,
     templates: options.templates ?? [],
     // Help overlay + first-run hint (UI state).
     helpOpen: help.helpOpen,
@@ -378,6 +390,7 @@ export function useEditor(options: UseEditorOptions) {
       applyMove,
       undo,
       redo,
+      jumpHistory,
       reset,
       importSnapshot,
       importJson,

@@ -250,6 +250,26 @@ test.describe("Editor smoke", () => {
     expect(errors).toEqual([]);
   });
 
+  test("undo-history panel lists commands and jumps on click", async ({ page }) => {
+    await page.goto("/");
+    await page
+      .getByRole("button", { name: /Cannon/ })
+      .first()
+      .click();
+    const surface = page.locator(".cbe-canvas");
+    await surface.click({ position: { x: 200, y: 200 }, force: true });
+    await surface.click({ position: { x: 340, y: 340 }, force: true });
+    await expect(page.getByText("BuildingPlaced").first()).toBeVisible();
+
+    // The History panel lists both "Add building" commands.
+    const history = page.locator(".cbe-history");
+    await expect(history.getByRole("button", { name: "Add building" })).toHaveCount(2);
+
+    // Clicking the oldest jumps back one step (undo → BuildingDeleted).
+    await history.getByRole("button", { name: "Add building" }).first().click();
+    await expect(page.getByText("BuildingDeleted").first()).toBeVisible();
+  });
+
   test("switches to the 3D view and mounts a WebGL canvas without crashing", async ({ page }) => {
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(String(e)));

@@ -9,6 +9,7 @@ export {
 } from "./useEditor";
 export { EditorCanvas } from "./EditorCanvas";
 export { ConfirmDialog, type ConfirmDialogProps } from "./ConfirmDialog";
+export { HistoryPanel } from "./HistoryPanel";
 export { ReplayPanel } from "./ReplayPanel";
 export { ShortcutsOverlay, type ShortcutsOverlayProps } from "./ShortcutsOverlay";
 export { SHORTCUTS, GESTURES, type Shortcut, type ShortcutGroup, type Gesture } from "./shortcuts";

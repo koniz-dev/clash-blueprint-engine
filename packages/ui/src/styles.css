@@ -156,6 +156,55 @@ body {
   color: #04121f;
 }
 
+/* History panel */
+.cbe-history {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.cbe-history-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  color: var(--text);
+  border: none;
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.cbe-history-item:hover:not(:disabled) {
+  background: var(--panel-2);
+}
+.cbe-history-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--border);
+  flex-shrink: 0;
+}
+.cbe-history-current {
+  font-weight: 600;
+  cursor: default;
+}
+.cbe-history-current .cbe-history-dot {
+  background: var(--accent);
+}
+.cbe-history-future {
+  color: var(--muted);
+}
+.cbe-history-future .cbe-history-dot {
+  background: transparent;
+  border: 1px solid var(--border);
+}
+
 /* Attack replay panel */
 .cbe-replay {
   display: flex;

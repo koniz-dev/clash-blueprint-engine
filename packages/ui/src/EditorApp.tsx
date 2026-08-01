@@ -10,6 +10,7 @@ import {
   ValidationPanel,
 } from "./Panels";
 import { ConfirmDialog } from "./ConfirmDialog";
+import { HistoryPanel } from "./HistoryPanel";
 import { ReplayPanel } from "./ReplayPanel";
 import { GESTURES, SHORTCUTS } from "./shortcuts";
 import { ShortcutsOverlay } from "./ShortcutsOverlay";
@@ -56,6 +57,7 @@ export function EditorApp(props: EditorAppProps): JSX.Element {
 
         <aside className="cbe-right">
           <Inspector controller={controller} />
+          <HistoryPanel controller={controller} />
           <ReplayPanel controller={controller} />
           <StatsPanel controller={controller} />
           <ValidationPanel controller={controller} />

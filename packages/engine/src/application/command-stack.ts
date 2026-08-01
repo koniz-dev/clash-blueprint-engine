@@ -69,6 +69,18 @@ export class CommandStack {
     return this.#redo.at(-1)?.label;
   }
 
+  /**
+   * A read-only projection of the history for a history/timeline UI: `undo` is
+   * the applied commands oldest→newest, `redo` the undone commands next→last.
+   * Labels only — the commands themselves stay encapsulated.
+   */
+  get entries(): { readonly undo: readonly string[]; readonly redo: readonly string[] } {
+    return {
+      undo: this.#undo.map((c) => c.label),
+      redo: [...this.#redo].reverse().map((c) => c.label),
+    };
+  }
+
   clear(): void {
     this.#undo.length = 0;
     this.#redo.length = 0;
