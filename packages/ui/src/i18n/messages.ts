@@ -69,6 +69,7 @@ export const en = {
   // Validation
   "validation.empty": "Run “Validate” to check the layout.",
   "validation.ok": "No issues — layout is valid.",
+  "validation.noRuleSet": "No rule set loaded — rules can't be checked.",
 
   // Defense score
   "analysis.empty": "Run “Analyze” for a defensive breakdown.",

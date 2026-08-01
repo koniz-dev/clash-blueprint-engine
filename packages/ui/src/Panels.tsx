@@ -96,12 +96,13 @@ export function StatsPanel({ controller }: { controller: EditorController }): JS
 
 export function ValidationPanel({ controller }: { controller: EditorController }): JSX.Element {
   const { t } = useI18n();
-  const report = controller.validation;
+  // Live: derived from the pure validator on every change (no "Validate" needed).
+  const report = controller.liveValidation.report;
   return (
     <div className="cbe-panel">
       <h2 className="cbe-panel-title">{t("panel.validation")}</h2>
       {!report ? (
-        <p className="cbe-muted">{t("validation.empty")}</p>
+        <p className="cbe-muted">{t("validation.noRuleSet")}</p>
       ) : report.issues.length === 0 ? (
         <p className="cbe-ok">{t("validation.ok")}</p>
       ) : (
