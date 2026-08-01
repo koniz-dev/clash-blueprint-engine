@@ -35,6 +35,34 @@ describe("second game pack: Keep Siege (zero engine code)", () => {
     expect(loaded.value.catalog.has("keep")).toBe(true);
   });
 
+  it("ships a progression of rule packs (Keep Levels 1–5)", () => {
+    if (!loaded.ok) throw new Error("pack failed to load");
+    for (const level of [1, 2, 3, 4, 5]) expect(loaded.value.ruleSets.has(level)).toBe(true);
+    // Allowances grow with the level (validated against the catalog on load).
+    const l1 = loaded.value.ruleSets.get(1);
+    const l5 = loaded.value.ruleSets.get(5);
+    expect((l5?.wallLimit ?? 0) > (l1?.wallLimit ?? 0)).toBe(true);
+  });
+
+  it("ships valid starter templates that rebuild into legal bases", () => {
+    if (!loaded.ok) throw new Error("pack failed to load");
+    // Loaded templates are already spatially re-validated by the loader.
+    expect(loaded.value.templates.has("starter")).toBe(true);
+    expect(loaded.value.templates.has("fortress")).toBe(true);
+
+    const starter = loaded.value.templates.get("starter")!;
+    const rebuilt = VillageEditor.forGridSize(
+      starter.grid.width,
+      loaded.value.catalog,
+      starter.tier,
+    );
+    const result = rebuilt.load(starter);
+    expect(result.ok).toBe(true);
+    expect(rebuilt.village.buildingCount).toBeGreaterThan(0);
+    // The keep (core) is present.
+    expect(rebuilt.village.listBuildings().some((b) => b.definitionId === "keep")).toBe(true);
+  });
+
   function buildBase() {
     if (!loaded.ok) throw new Error("keep-siege pack failed to load");
     const editor = VillageEditor.forGridSize(40, loaded.value.catalog, 3);

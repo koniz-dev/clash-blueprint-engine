@@ -108,7 +108,16 @@ their stats, not their category name.
 
 The `keep-siege` pack plus
 [`examples/pipeline/src/demo-game.test.ts`](../examples/pipeline/src/demo-game.test.ts)
-are a complete, tested worked example.
+are a complete, tested worked example — a full second game with its own tier axis
+("Keep Level"), core (`keep`) and categories (`turret`/`vault`/`snare`). It ships
+**five rule packs** (Keep Levels 1–5) and **two starter templates**
+(`templates/starter.json`, `templates/fortress.json`), all validated on load.
+
+> **Troops are game-agnostic, not pack data.** A game pack is `game.json` +
+> `buildings/` + `rules/` + `templates/`. Attack troops are shared across games
+> (`DEFAULT_TROOPS` in `@clash/simulation`, or any `TroopCatalog` you pass to
+> `simulateAttack`), so they are **not** loaded per-pack — which is why there's no
+> `troops/` directory.
 
 ## Bundled Clash of Clans data
 

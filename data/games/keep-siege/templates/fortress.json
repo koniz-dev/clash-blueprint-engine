@@ -1,0 +1,790 @@
+{
+  "grid": {
+    "width": 40,
+    "height": 40
+  },
+  "tier": 5,
+  "buildings": [
+    {
+      "id": "ent_1",
+      "definitionId": "keep",
+      "position": {
+        "x": 18,
+        "y": 18
+      },
+      "rotation": 0
+    },
+    {
+      "id": "ent_2",
+      "definitionId": "turret",
+      "position": {
+        "x": 8,
+        "y": 8
+      },
+      "rotation": 0
+    },
+    {
+      "id": "ent_3",
+      "definitionId": "turret",
+      "position": {
+        "x": 30,
+        "y": 8
+      },
+      "rotation": 0
+    },
+    {
+      "id": "ent_4",
+      "definitionId": "turret",
+      "position": {
+        "x": 8,
+        "y": 30
+      },
+      "rotation": 0
+    },
+    {
+      "id": "ent_5",
+      "definitionId": "turret",
+      "position": {
+        "x": 30,
+        "y": 30
+      },
+      "rotation": 0
+    },
+    {
+      "id": "ent_6",
+      "definitionId": "turret",
+      "position": {
+        "x": 19,
+        "y": 6
+      },
+      "rotation": 0
+    },
+    {
+      "id": "ent_7",
+      "definitionId": "turret",
+      "position": {
+        "x": 19,
+        "y": 32
+      },
+      "rotation": 0
+    },
+    {
+      "id": "ent_8",
+      "definitionId": "turret",
+      "position": {
+        "x": 6,
+        "y": 19
+      },
+      "rotation": 0
+    },
+    {
+      "id": "ent_9",
+      "definitionId": "turret",
+      "position": {
+        "x": 32,
+        "y": 19
+      },
+      "rotation": 0
+    },
+    {
+      "id": "ent_a",
+      "definitionId": "ballista",
+      "position": {
+        "x": 12,
+        "y": 12
+      },
+      "rotation": 0
+    },
+    {
+      "id": "ent_b",
+      "definitionId": "ballista",
+      "position": {
+        "x": 25,
+        "y": 25
+      },
+      "rotation": 0
+    },
+    {
+      "id": "ent_c",
+      "definitionId": "gold_vault",
+      "position": {
+        "x": 9,
+        "y": 18
+      },
+      "rotation": 0
+    },
+    {
+      "id": "ent_d",
+      "definitionId": "gold_vault",
+      "position": {
+        "x": 28,
+        "y": 18
+      },
+      "rotation": 0
+    },
+    {
+      "id": "ent_e",
+      "definitionId": "barracks",
+      "position": {
+        "x": 18,
+        "y": 9
+      },
+      "rotation": 0
+    },
+    {
+      "id": "ent_f",
+      "definitionId": "barracks",
+      "position": {
+        "x": 18,
+        "y": 28
+      },
+      "rotation": 0
+    }
+  ],
+  "walls": [
+    {
+      "id": "ent_h",
+      "position": {
+        "x": 14,
+        "y": 25
+      }
+    },
+    {
+      "id": "ent_i",
+      "position": {
+        "x": 15,
+        "y": 14
+      }
+    },
+    {
+      "id": "ent_j",
+      "position": {
+        "x": 15,
+        "y": 25
+      }
+    },
+    {
+      "id": "ent_k",
+      "position": {
+        "x": 16,
+        "y": 14
+      }
+    },
+    {
+      "id": "ent_l",
+      "position": {
+        "x": 16,
+        "y": 25
+      }
+    },
+    {
+      "id": "ent_m",
+      "position": {
+        "x": 17,
+        "y": 14
+      }
+    },
+    {
+      "id": "ent_n",
+      "position": {
+        "x": 17,
+        "y": 25
+      }
+    },
+    {
+      "id": "ent_o",
+      "position": {
+        "x": 18,
+        "y": 14
+      }
+    },
+    {
+      "id": "ent_p",
+      "position": {
+        "x": 18,
+        "y": 25
+      }
+    },
+    {
+      "id": "ent_q",
+      "position": {
+        "x": 19,
+        "y": 14
+      }
+    },
+    {
+      "id": "ent_r",
+      "position": {
+        "x": 19,
+        "y": 25
+      }
+    },
+    {
+      "id": "ent_s",
+      "position": {
+        "x": 20,
+        "y": 14
+      }
+    },
+    {
+      "id": "ent_t",
+      "position": {
+        "x": 20,
+        "y": 25
+      }
+    },
+    {
+      "id": "ent_u",
+      "position": {
+        "x": 21,
+        "y": 14
+      }
+    },
+    {
+      "id": "ent_v",
+      "position": {
+        "x": 21,
+        "y": 25
+      }
+    },
+    {
+      "id": "ent_w",
+      "position": {
+        "x": 22,
+        "y": 14
+      }
+    },
+    {
+      "id": "ent_x",
+      "position": {
+        "x": 22,
+        "y": 25
+      }
+    },
+    {
+      "id": "ent_y",
+      "position": {
+        "x": 23,
+        "y": 14
+      }
+    },
+    {
+      "id": "ent_z",
+      "position": {
+        "x": 23,
+        "y": 25
+      }
+    },
+    {
+      "id": "ent_10",
+      "position": {
+        "x": 24,
+        "y": 14
+      }
+    },
+    {
+      "id": "ent_11",
+      "position": {
+        "x": 24,
+        "y": 25
+      }
+    },
+    {
+      "id": "ent_12",
+      "position": {
+        "x": 25,
+        "y": 14
+      }
+    },
+    {
+      "id": "ent_14",
+      "position": {
+        "x": 14,
+        "y": 15
+      }
+    },
+    {
+      "id": "ent_15",
+      "position": {
+        "x": 25,
+        "y": 15
+      }
+    },
+    {
+      "id": "ent_16",
+      "position": {
+        "x": 14,
+        "y": 16
+      }
+    },
+    {
+      "id": "ent_17",
+      "position": {
+        "x": 25,
+        "y": 16
+      }
+    },
+    {
+      "id": "ent_18",
+      "position": {
+        "x": 14,
+        "y": 17
+      }
+    },
+    {
+      "id": "ent_19",
+      "position": {
+        "x": 25,
+        "y": 17
+      }
+    },
+    {
+      "id": "ent_1a",
+      "position": {
+        "x": 14,
+        "y": 18
+      }
+    },
+    {
+      "id": "ent_1b",
+      "position": {
+        "x": 25,
+        "y": 18
+      }
+    },
+    {
+      "id": "ent_1c",
+      "position": {
+        "x": 14,
+        "y": 19
+      }
+    },
+    {
+      "id": "ent_1d",
+      "position": {
+        "x": 25,
+        "y": 19
+      }
+    },
+    {
+      "id": "ent_1e",
+      "position": {
+        "x": 14,
+        "y": 20
+      }
+    },
+    {
+      "id": "ent_1f",
+      "position": {
+        "x": 25,
+        "y": 20
+      }
+    },
+    {
+      "id": "ent_1g",
+      "position": {
+        "x": 14,
+        "y": 21
+      }
+    },
+    {
+      "id": "ent_1h",
+      "position": {
+        "x": 25,
+        "y": 21
+      }
+    },
+    {
+      "id": "ent_1i",
+      "position": {
+        "x": 14,
+        "y": 22
+      }
+    },
+    {
+      "id": "ent_1j",
+      "position": {
+        "x": 25,
+        "y": 22
+      }
+    },
+    {
+      "id": "ent_1k",
+      "position": {
+        "x": 14,
+        "y": 23
+      }
+    },
+    {
+      "id": "ent_1l",
+      "position": {
+        "x": 25,
+        "y": 23
+      }
+    },
+    {
+      "id": "ent_1m",
+      "position": {
+        "x": 14,
+        "y": 24
+      }
+    },
+    {
+      "id": "ent_1n",
+      "position": {
+        "x": 25,
+        "y": 24
+      }
+    },
+    {
+      "id": "ent_1p",
+      "position": {
+        "x": 12,
+        "y": 27
+      }
+    },
+    {
+      "id": "ent_1r",
+      "position": {
+        "x": 13,
+        "y": 27
+      }
+    },
+    {
+      "id": "ent_1t",
+      "position": {
+        "x": 14,
+        "y": 27
+      }
+    },
+    {
+      "id": "ent_1u",
+      "position": {
+        "x": 15,
+        "y": 12
+      }
+    },
+    {
+      "id": "ent_1v",
+      "position": {
+        "x": 15,
+        "y": 27
+      }
+    },
+    {
+      "id": "ent_1w",
+      "position": {
+        "x": 16,
+        "y": 12
+      }
+    },
+    {
+      "id": "ent_1x",
+      "position": {
+        "x": 16,
+        "y": 27
+      }
+    },
+    {
+      "id": "ent_1y",
+      "position": {
+        "x": 17,
+        "y": 12
+      }
+    },
+    {
+      "id": "ent_1z",
+      "position": {
+        "x": 17,
+        "y": 27
+      }
+    },
+    {
+      "id": "ent_20",
+      "position": {
+        "x": 18,
+        "y": 12
+      }
+    },
+    {
+      "id": "ent_21",
+      "position": {
+        "x": 18,
+        "y": 27
+      }
+    },
+    {
+      "id": "ent_22",
+      "position": {
+        "x": 19,
+        "y": 12
+      }
+    },
+    {
+      "id": "ent_23",
+      "position": {
+        "x": 19,
+        "y": 27
+      }
+    },
+    {
+      "id": "ent_24",
+      "position": {
+        "x": 20,
+        "y": 12
+      }
+    },
+    {
+      "id": "ent_25",
+      "position": {
+        "x": 20,
+        "y": 27
+      }
+    },
+    {
+      "id": "ent_26",
+      "position": {
+        "x": 21,
+        "y": 12
+      }
+    },
+    {
+      "id": "ent_27",
+      "position": {
+        "x": 21,
+        "y": 27
+      }
+    },
+    {
+      "id": "ent_28",
+      "position": {
+        "x": 22,
+        "y": 12
+      }
+    },
+    {
+      "id": "ent_29",
+      "position": {
+        "x": 22,
+        "y": 27
+      }
+    },
+    {
+      "id": "ent_2a",
+      "position": {
+        "x": 23,
+        "y": 12
+      }
+    },
+    {
+      "id": "ent_2b",
+      "position": {
+        "x": 23,
+        "y": 27
+      }
+    },
+    {
+      "id": "ent_2c",
+      "position": {
+        "x": 24,
+        "y": 12
+      }
+    },
+    {
+      "id": "ent_2d",
+      "position": {
+        "x": 24,
+        "y": 27
+      }
+    },
+    {
+      "id": "ent_2e",
+      "position": {
+        "x": 25,
+        "y": 12
+      }
+    },
+    {
+      "id": "ent_2g",
+      "position": {
+        "x": 26,
+        "y": 12
+      }
+    },
+    {
+      "id": "ent_2i",
+      "position": {
+        "x": 27,
+        "y": 12
+      }
+    },
+    {
+      "id": "ent_2l",
+      "position": {
+        "x": 27,
+        "y": 13
+      }
+    },
+    {
+      "id": "ent_2n",
+      "position": {
+        "x": 27,
+        "y": 14
+      }
+    },
+    {
+      "id": "ent_2o",
+      "position": {
+        "x": 12,
+        "y": 15
+      }
+    },
+    {
+      "id": "ent_2p",
+      "position": {
+        "x": 27,
+        "y": 15
+      }
+    },
+    {
+      "id": "ent_2q",
+      "position": {
+        "x": 12,
+        "y": 16
+      }
+    },
+    {
+      "id": "ent_2r",
+      "position": {
+        "x": 27,
+        "y": 16
+      }
+    },
+    {
+      "id": "ent_2s",
+      "position": {
+        "x": 12,
+        "y": 17
+      }
+    },
+    {
+      "id": "ent_2t",
+      "position": {
+        "x": 27,
+        "y": 17
+      }
+    },
+    {
+      "id": "ent_2u",
+      "position": {
+        "x": 12,
+        "y": 18
+      }
+    },
+    {
+      "id": "ent_2v",
+      "position": {
+        "x": 27,
+        "y": 18
+      }
+    },
+    {
+      "id": "ent_2w",
+      "position": {
+        "x": 12,
+        "y": 19
+      }
+    },
+    {
+      "id": "ent_2x",
+      "position": {
+        "x": 27,
+        "y": 19
+      }
+    },
+    {
+      "id": "ent_2y",
+      "position": {
+        "x": 12,
+        "y": 20
+      }
+    },
+    {
+      "id": "ent_2z",
+      "position": {
+        "x": 27,
+        "y": 20
+      }
+    },
+    {
+      "id": "ent_30",
+      "position": {
+        "x": 12,
+        "y": 21
+      }
+    },
+    {
+      "id": "ent_31",
+      "position": {
+        "x": 27,
+        "y": 21
+      }
+    },
+    {
+      "id": "ent_32",
+      "position": {
+        "x": 12,
+        "y": 22
+      }
+    },
+    {
+      "id": "ent_33",
+      "position": {
+        "x": 27,
+        "y": 22
+      }
+    },
+    {
+      "id": "ent_34",
+      "position": {
+        "x": 12,
+        "y": 23
+      }
+    },
+    {
+      "id": "ent_35",
+      "position": {
+        "x": 27,
+        "y": 23
+      }
+    },
+    {
+      "id": "ent_36",
+      "position": {
+        "x": 12,
+        "y": 24
+      }
+    },
+    {
+      "id": "ent_37",
+      "position": {
+        "x": 27,
+        "y": 24
+      }
+    },
+    {
+      "id": "ent_38",
+      "position": {
+        "x": 12,
+        "y": 25
+      }
+    },
+    {
+      "id": "ent_3a",
+      "position": {
+        "x": 12,
+        "y": 26
+      }
+    }
+  ]
+}
