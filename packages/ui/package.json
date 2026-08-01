@@ -36,7 +36,7 @@
     "@clash/rules-engine": "workspace:*",
     "@clash/shared": "workspace:*",
     "@clash/simulation": "workspace:*",
-    "@react-three/drei": "^9.114.0",
+    "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^8.17.10",
     "konva": "^9.3.16",
     "react-konva": "^18.2.10",
