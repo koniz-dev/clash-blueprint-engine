@@ -328,8 +328,11 @@ export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.El
     if (tile) actAt(tile);
   };
 
+  // Grab cursor for the Hand tool (and while Space-panning in Select), matching
+  // the Figma-style panning affordance.
+  const panning = tool === "hand" || (tool === "select" && spaceHeld);
   return (
-    <div ref={ref} className="cbe-canvas">
+    <div ref={ref} className={`cbe-canvas${panning ? " cbe-canvas-pan" : ""}`}>
       <Stage
         ref={stageRef}
         width={size.width}

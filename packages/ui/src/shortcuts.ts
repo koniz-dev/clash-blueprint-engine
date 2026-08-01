@@ -170,6 +170,16 @@ export const SHORTCUTS: readonly Shortcut[] = [
     ],
     run: (c) => c.setTool("delete"),
   },
+  {
+    id: "tool-hand",
+    label: "Hand tool (pan)",
+    group: "Tools",
+    keys: [
+      { key: "h", mod: false },
+      { key: "5", mod: false },
+    ],
+    run: (c) => c.setTool("hand"),
+  },
 
   // --- View ---------------------------------------------------------------
   {

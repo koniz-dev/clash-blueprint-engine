@@ -30,10 +30,12 @@ export const vi: Messages = {
   "tool.place": "Đặt",
   "tool.wall": "Tường",
   "tool.delete": "Xóa",
+  "tool.hand": "Di chuyển",
   "tool.select.hint": "Chọn & xem công trình",
   "tool.place.hint": "Đặt công trình đã chọn",
   "tool.wall.hint": "Vẽ tường (kéo)",
   "tool.delete.hint": "Xóa công trình & tường",
+  "tool.hand.hint": "Kéo để di chuyển khung nhìn",
 
   "panel.buildings": "Công trình",
   "panel.inspector": "Chi tiết",

@@ -15,6 +15,7 @@ const TOOLS: ReadonlyArray<{
   { id: "place", labelKey: "tool.place", hintKey: "tool.place.hint", shortcutId: "tool-place" },
   { id: "wall", labelKey: "tool.wall", hintKey: "tool.wall.hint", shortcutId: "tool-wall" },
   { id: "delete", labelKey: "tool.delete", hintKey: "tool.delete.hint", shortcutId: "tool-delete" },
+  { id: "hand", labelKey: "tool.hand", hintKey: "tool.hand.hint", shortcutId: "tool-hand" },
 ];
 
 function detectMac(): boolean {

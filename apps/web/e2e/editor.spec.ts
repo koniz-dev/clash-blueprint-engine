@@ -188,6 +188,25 @@ test.describe("Editor smoke", () => {
     await expect(page.getByText("BuildingRotated").first()).toBeVisible();
   });
 
+  test("hand tool: H activates a pan mode with a grab cursor", async ({ page }) => {
+    await page.goto("/");
+
+    // A click first guarantees the app has hydrated before window key handlers.
+    await page
+      .getByRole("button", { name: /Cannon/ })
+      .first()
+      .click();
+
+    // H (or the Hand toolbar button) switches to the pan tool.
+    await page.keyboard.press("h");
+    await expect(page.getByRole("button", { name: "Hand", exact: true })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    // The canvas advertises the Figma-style grab affordance.
+    await expect(page.locator(".cbe-canvas")).toHaveClass(/cbe-canvas-pan/);
+  });
+
   test("confirms before discarding a non-empty layout when opening a template", async ({
     page,
   }) => {

@@ -64,7 +64,9 @@ a Vue or Svelte hook, a CLI, or tests with no change to the core.
   **two-finger pinch-to-zoom**; `touch-action: none` hands gestures to the canvas
   instead of the browser.
 - **Tools**: Select (inspect), Place (from the library, with rotation), Wall
-  (click-drag paint, **auto-connecting** into runs and corners), Delete.
+  (click-drag paint, **auto-connecting** into runs and corners), Delete, and
+  **Hand** (a Figma-style pan tool — `H`/`5` or hold Space in Select; drag to pan
+  with a grab cursor).
 - **Direct manipulation**: in the Select tool, **drag a building** to move it —
   a live dashed ghost previews the destination and the drop commits as **one**
   undoable command (a multi-selection moves together as one `MacroCommand`).
@@ -169,7 +171,7 @@ expected shortcut (locking behavior).
 | Selection | Delete selection               | Del / ⌫               |
 | Selection | Nudge selection                | ↑ ↓ ← →               |
 | Selection | Rotate selection               | R                     |
-| Tools     | Select / Place / Wall / Delete | V·1 / P·2 / W·3 / D·4 |
+| Tools     | Select / Place / Wall / Delete / Hand | V·1 / P·2 / W·3 / D·4 / H·5 |
 | View      | Show shortcuts                 | ?                     |
 
 Plus mouse gestures (drag = marquee, drag a building = move, Shift+click =

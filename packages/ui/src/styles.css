@@ -406,6 +406,13 @@ body {
      browser scrolling or page-zooming. */
   touch-action: none;
 }
+/* Hand tool (and Space-pan): Figma-style grab / grabbing affordance. */
+.cbe-canvas-pan {
+  cursor: grab;
+}
+.cbe-canvas-pan:active {
+  cursor: grabbing;
+}
 .cbe-scene3d {
   position: absolute;
   inset: 0;

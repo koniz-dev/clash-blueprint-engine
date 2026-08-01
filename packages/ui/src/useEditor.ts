@@ -34,7 +34,7 @@ import { usePersistence } from "./hooks/usePersistence";
 import { useHelp } from "./hooks/useHelp";
 import { useDiscardGuard } from "./hooks/useDiscardGuard";
 
-export type Tool = "select" | "place" | "wall" | "delete";
+export type Tool = "select" | "place" | "wall" | "delete" | "hand";
 
 /** Which view renders the layout: the 2D Konva canvas or the 3D three.js scene. */
 export type ViewMode = "2d" | "3d";

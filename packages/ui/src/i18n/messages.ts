@@ -29,10 +29,12 @@ export const en = {
   "tool.place": "Place",
   "tool.wall": "Wall",
   "tool.delete": "Delete",
+  "tool.hand": "Hand",
   "tool.select.hint": "Select & inspect buildings",
   "tool.place.hint": "Place the chosen building",
   "tool.wall.hint": "Paint walls (drag)",
   "tool.delete.hint": "Remove buildings & walls",
+  "tool.hand.hint": "Pan the canvas (drag)",
 
   "panel.buildings": "Buildings",
   "panel.inspector": "Inspector",
