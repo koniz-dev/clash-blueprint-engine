@@ -11,6 +11,7 @@ import { AddBuildingCommand } from "./commands/add-building.js";
 import { AddWallCommand } from "./commands/add-wall.js";
 import { MacroCommand } from "./commands/macro.js";
 import { MoveBuildingCommand } from "./commands/move-building.js";
+import { MoveWallCommand } from "./commands/move-wall.js";
 import { RemoveBuildingCommand } from "./commands/remove-building.js";
 import { RemoveWallCommand } from "./commands/remove-wall.js";
 import { RotateBuildingCommand } from "./commands/rotate-building.js";
@@ -85,11 +86,14 @@ export class VillageEditor {
    * failure rolls the whole thing back. An empty list is a successful no-op.
    */
   moveBuildings(moves: readonly { id: BuildingId; to: GridVec }[]): Result<void, EngineError> {
-    const commands = moves.map((m) => new MoveBuildingCommand({ id: m.id, to: m.to }));
-    const [first, ...rest] = commands;
-    if (!first) return ok(undefined);
-    if (rest.length === 0) return this.#history.execute(first);
-    return this.#history.execute(new MacroCommand("Move buildings", commands));
+    return this.#runBatch(
+      "Move buildings",
+      moves.map((m) => new MoveBuildingCommand({ id: m.id, to: m.to })),
+    );
+  }
+
+  moveWall(id: WallId, to: GridVec): Result<void, EngineError> {
+    return this.#history.execute(new MoveWallCommand({ id, to }));
   }
 
   rotateBuilding(id: BuildingId, to: Rotation): Result<void, EngineError> {
@@ -124,14 +128,33 @@ export class VillageEditor {
     buildingIds: readonly BuildingId[],
     wallIds: readonly WallId[],
   ): Result<void, EngineError> {
-    const commands: Command[] = [
+    return this.#runBatch("Delete selection", [
       ...buildingIds.map((id) => new RemoveBuildingCommand({ id })),
       ...wallIds.map((id) => new RemoveWallCommand({ id })),
-    ];
+    ]);
+  }
+
+  /**
+   * Move a mixed set of buildings and walls in one atomic, undoable step
+   * (drag / arrow-nudge of a selection that can hold both kinds). Either every
+   * move applies or none does. An empty set is a successful no-op.
+   */
+  moveEntities(
+    buildingMoves: readonly { id: BuildingId; to: GridVec }[],
+    wallMoves: readonly { id: WallId; to: GridVec }[],
+  ): Result<void, EngineError> {
+    return this.#runBatch("Move selection", [
+      ...buildingMoves.map((m) => new MoveBuildingCommand({ id: m.id, to: m.to })),
+      ...wallMoves.map((m) => new MoveWallCommand({ id: m.id, to: m.to })),
+    ]);
+  }
+
+  /** Run a list of commands as a single history entry (macro when >1). */
+  #runBatch(label: string, commands: Command[]): Result<void, EngineError> {
     const [first, ...rest] = commands;
     if (!first) return ok(undefined);
     if (rest.length === 0) return this.#history.execute(first);
-    return this.#history.execute(new MacroCommand("Delete selection", commands));
+    return this.#history.execute(new MacroCommand(label, commands));
   }
 
   // --- History ------------------------------------------------------------

@@ -9,6 +9,7 @@ import {
   StatsPanel,
   ValidationPanel,
 } from "./Panels";
+import { ConfirmDialog } from "./ConfirmDialog";
 import { ReplayPanel } from "./ReplayPanel";
 import { GESTURES, SHORTCUTS } from "./shortcuts";
 import { ShortcutsOverlay } from "./ShortcutsOverlay";
@@ -72,6 +73,13 @@ export function EditorApp(props: EditorAppProps): JSX.Element {
         onClose={controller.actions.closeHelp}
         shortcuts={SHORTCUTS}
         gestures={GESTURES}
+      />
+
+      <ConfirmDialog
+        open={controller.confirmPrompt !== null}
+        message={controller.confirmPrompt?.message ?? ""}
+        onConfirm={controller.actions.confirmDiscard}
+        onCancel={controller.actions.cancelConfirm}
       />
     </div>
   );

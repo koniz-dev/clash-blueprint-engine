@@ -7,6 +7,7 @@ import { WALL_COLOR, categoryColor, categorySymbol } from "@clash/renderer";
 import { replayStateAt } from "@clash/simulation";
 import type { SceneWall } from "@clash/plugins";
 import type { GridVec, Rect as TileRect } from "@clash/shared";
+import { alignmentGuides, entityIdAt } from "./canvas-geometry";
 import type { EditorController } from "./useEditor";
 
 const TILE = 24;
@@ -60,21 +61,6 @@ function pointerTile(stage: Konva.Stage): GridVec | null {
   return { x: Math.floor(world.x / TILE), y: Math.floor(world.y / TILE) };
 }
 
-/** Id of the building whose footprint covers `tile`, or null. */
-function buildingIdAt(scene: EditorController["scene"], tile: GridVec): string | null {
-  for (const b of scene.buildings) {
-    if (
-      tile.x >= b.bounds.x &&
-      tile.x < b.bounds.x + b.bounds.width &&
-      tile.y >= b.bounds.y &&
-      tile.y < b.bounds.y + b.bounds.height
-    ) {
-      return b.id;
-    }
-  }
-  return null;
-}
-
 export interface EditorCanvasProps {
   readonly controller: EditorController;
   readonly catalog: BuildingCatalog;
@@ -98,11 +84,11 @@ export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.El
   const additive = useRef(false);
   const downPos = useRef<{ x: number; y: number } | null>(null);
   const moved = useRef(false);
-  // Drag-to-move: a candidate is armed on mouse-down over a building, and
-  // promoted to an active drag once the pointer actually moves.
+  // Drag-to-move: a candidate is armed on mouse-down over a building or wall,
+  // and promoted to an active drag once the pointer actually moves.
   const pendingDrag = useRef<{
     startTile: GridVec;
-    buildingId: string;
+    entityId: string;
     wasSelected: boolean;
   } | null>(null);
   const drag = useRef<{ startTile: GridVec; ids: string[] } | null>(null);
@@ -127,6 +113,21 @@ export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.El
   const { scene, tool } = controller;
   const gridW = scene.grid.width * TILE;
   const gridH = scene.grid.height * TILE;
+
+  // Alignment guides while dragging (view-only geometry).
+  const guides =
+    drag.current && dragDelta && (dragDelta.x !== 0 || dragDelta.y !== 0)
+      ? alignmentGuides(scene, new Set(drag.current.ids), dragDelta.x, dragDelta.y)
+      : null;
+
+  // Recenter the viewport on a point picked in the minimap (pan only).
+  const jumpTo = (fx: number, fy: number): void => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    const s = stage.scaleX();
+    stage.position({ x: size.width / 2 - fx * gridW * s, y: size.height / 2 - fy * gridH * s });
+    stage.batchDraw();
+  };
 
   // Replay projection: interpolated unit poses + cumulative destruction at the
   // current playback time. Pure view over the engine-produced timeline.
@@ -196,14 +197,14 @@ export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.El
       if (tile) actAt(tile);
     } else if (tool === "select" && !spaceHeld) {
       const tile = pointerTile(stage);
-      const buildingId = tile ? buildingIdAt(scene, tile) : null;
-      // Plain press on a building arms a drag; shift-press or empty space
+      const entityId = tile ? entityIdAt(scene, tile) : null;
+      // Plain press on a building/wall arms a drag; shift-press or empty space
       // falls back to marquee / toggle selection.
-      if (tile && buildingId && !e.evt.shiftKey) {
+      if (tile && entityId && !e.evt.shiftKey) {
         pendingDrag.current = {
           startTile: tile,
-          buildingId,
-          wasSelected: controller.selectedIds.includes(buildingId),
+          entityId,
+          wasSelected: controller.selectedIds.includes(entityId),
         };
       } else {
         marqueeStart.current = tile;
@@ -226,13 +227,17 @@ export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.El
     // Promote an armed candidate into an active drag on first real movement.
     if (pendingDrag.current && !drag.current && moved.current) {
       const p = pendingDrag.current;
-      const buildingIds = new Set(scene.buildings.map((b) => b.id));
+      const entityIds = new Set<string>([
+        ...scene.buildings.map((b) => b.id),
+        ...scene.walls.map((w) => w.id),
+      ]);
       let ids: string[];
       if (p.wasSelected) {
-        ids = controller.selectedIds.filter((id) => buildingIds.has(id));
+        // Drag the whole selection (buildings and walls) together.
+        ids = controller.selectedIds.filter((id) => entityIds.has(id));
       } else {
-        controller.actions.selectBuilding(p.buildingId, false);
-        ids = [p.buildingId];
+        controller.actions.selectBuilding(p.entityId, false);
+        ids = [p.entityId];
       }
       drag.current = { startTile: p.startTile, ids };
     }
@@ -367,28 +372,69 @@ export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.El
           {/* Hover / placement preview */}
           {hover && <PlacementPreview controller={controller} catalog={catalog} tile={hover} />}
 
-          {/* Drag-to-move ghost: selected buildings offset by the live delta */}
-          {drag.current &&
-            dragDelta &&
-            (dragDelta.x !== 0 || dragDelta.y !== 0) &&
-            scene.buildings
-              .filter((b) => drag.current?.ids.includes(b.id))
-              .map((b) => (
-                <Rect
-                  key={`ghost-${b.id}`}
-                  x={(b.bounds.x + dragDelta.x) * TILE}
-                  y={(b.bounds.y + dragDelta.y) * TILE}
-                  width={b.bounds.width * TILE}
-                  height={b.bounds.height * TILE}
-                  cornerRadius={3}
-                  fill={categoryColor(b.category)}
-                  opacity={0.4}
-                  stroke="#ffd600"
-                  strokeWidth={2}
-                  dash={[4, 4]}
-                  listening={false}
-                />
-              ))}
+          {/* Drag-to-move ghost: selected buildings + walls offset by the live delta */}
+          {drag.current && dragDelta && (dragDelta.x !== 0 || dragDelta.y !== 0) && (
+            <>
+              {scene.buildings
+                .filter((b) => drag.current?.ids.includes(b.id))
+                .map((b) => (
+                  <Rect
+                    key={`ghost-${b.id}`}
+                    x={(b.bounds.x + dragDelta.x) * TILE}
+                    y={(b.bounds.y + dragDelta.y) * TILE}
+                    width={b.bounds.width * TILE}
+                    height={b.bounds.height * TILE}
+                    cornerRadius={3}
+                    fill={categoryColor(b.category)}
+                    opacity={0.4}
+                    stroke="#ffd600"
+                    strokeWidth={2}
+                    dash={[4, 4]}
+                    listening={false}
+                  />
+                ))}
+              {scene.walls
+                .filter((w) => drag.current?.ids.includes(w.id))
+                .map((w) => (
+                  <Rect
+                    key={`ghost-${w.id}`}
+                    x={(w.position.x + dragDelta.x) * TILE}
+                    y={(w.position.y + dragDelta.y) * TILE}
+                    width={TILE}
+                    height={TILE}
+                    cornerRadius={2}
+                    fill={WALL_COLOR}
+                    opacity={0.4}
+                    stroke="#ffd600"
+                    strokeWidth={2}
+                    dash={[4, 4]}
+                    listening={false}
+                  />
+                ))}
+            </>
+          )}
+
+          {/* Alignment guides: edges/centres that line up with static entities */}
+          {guides?.xs.map((x) => (
+            <Line
+              key={`gx${x}`}
+              points={[x * TILE, 0, x * TILE, gridH]}
+              stroke="#ff5ca8"
+              strokeWidth={1}
+              dash={[3, 3]}
+              listening={false}
+            />
+          ))}
+          {guides?.ys.map((y) => (
+            <Line
+              key={`gy${y}`}
+              points={[0, y * TILE, gridW, y * TILE]}
+              stroke="#ff5ca8"
+              strokeWidth={1}
+              dash={[3, 3]}
+              listening={false}
+            />
+          ))}
 
           {/* Marquee (drag-box) selection outline */}
           {marquee && (
@@ -437,8 +483,66 @@ export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.El
           ))}
         </Layer>
       </Stage>
+      <MiniMap scene={scene} onJump={jumpTo} />
       <div className="cbe-zoom-badge">{Math.round(scale * 100)}%</div>
     </div>
+  );
+}
+
+const clamp01 = (v: number): number => (v < 0 ? 0 : v > 1 ? 1 : v);
+
+/**
+ * A small overview of the whole grid for orientation on large layouts. It is a
+ * pure projection of the `Scene` (buildings + walls); clicking recenters the
+ * viewport (pan only — it never mutates the village).
+ */
+function MiniMap({
+  scene,
+  onJump,
+}: {
+  scene: EditorController["scene"];
+  onJump: (fx: number, fy: number) => void;
+}): JSX.Element {
+  const { width: w, height: h } = scene.grid;
+  const handleClick = (e: React.MouseEvent<SVGSVGElement>): void => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    onJump(
+      clamp01((e.clientX - rect.left) / rect.width),
+      clamp01((e.clientY - rect.top) / rect.height),
+    );
+  };
+  return (
+    <svg
+      className="cbe-minimap"
+      viewBox={`0 0 ${w} ${h}`}
+      style={{ aspectRatio: `${w} / ${h}` }}
+      preserveAspectRatio="none"
+      role="img"
+      aria-label="Minimap — click to recenter"
+      onClick={handleClick}
+    >
+      <rect x={0} y={0} width={w} height={h} className="cbe-minimap-bg" />
+      {scene.walls.map((wall) => (
+        <rect
+          key={wall.id}
+          x={wall.position.x}
+          y={wall.position.y}
+          width={1}
+          height={1}
+          fill={WALL_COLOR}
+        />
+      ))}
+      {scene.buildings.map((b) => (
+        <rect
+          key={b.id}
+          x={b.bounds.x}
+          y={b.bounds.y}
+          width={b.bounds.width}
+          height={b.bounds.height}
+          fill={categoryColor(b.category)}
+        />
+      ))}
+    </svg>
   );
 }
 

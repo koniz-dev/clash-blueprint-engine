@@ -174,6 +174,27 @@ export class Village {
     return ok(segment);
   }
 
+  /** Move a wall to a new tile, preserving its id. Validated atomically. */
+  moveWall(id: WallId, position: GridVec): Result<WallSegment, EngineError> {
+    const current = this.#walls.get(id);
+    if (!current) return err({ kind: "NOT_FOUND", id });
+    if (!this.grid.containsTile(position)) {
+      return err({
+        kind: "OUT_OF_BOUNDS",
+        bounds: { x: position.x, y: position.y, width: 1, height: 1 },
+      });
+    }
+    const conflicts = this.#conflictingCells([position], id);
+    if (conflicts.length > 0) {
+      return err({ kind: "OVERLAP", cells: conflicts });
+    }
+    this.#index.release([current.position]);
+    this.#index.occupy(id, [position]);
+    const next: WallSegment = { ...current, position };
+    this.#walls.set(id, next);
+    return ok(next);
+  }
+
   removeWall(id: WallId): Result<WallSegment, EngineError> {
     const segment = this.#walls.get(id);
     if (!segment) return err({ kind: "NOT_FOUND", id });

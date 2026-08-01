@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { BuildingCatalog, BuildingDefinition } from "@clash/engine";
 import { categoryColor, categoryOrder } from "@clash/renderer";
 import type { EditorController } from "./useEditor";
@@ -10,15 +10,24 @@ export function BuildingLibrary({
   controller: EditorController;
   catalog: BuildingCatalog;
 }): JSX.Element {
+  const [query, setQuery] = useState("");
+
   const grouped = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    const matches = (def: BuildingDefinition): boolean =>
+      needle === "" ||
+      def.name.toLowerCase().includes(needle) ||
+      def.category.toLowerCase().includes(needle);
+
     const map = new Map<string, BuildingDefinition[]>();
     for (const def of catalog.all()) {
+      if (!matches(def)) continue;
       const list = map.get(def.category) ?? [];
       list.push(def);
       map.set(def.category, list);
     }
     return map;
-  }, [catalog]);
+  }, [catalog, query]);
 
   // Well-known categories first, then any game-defined ones alphabetically.
   const categories = [...grouped.keys()].sort(
@@ -33,6 +42,15 @@ export function BuildingLibrary({
   return (
     <div className="cbe-panel">
       <h2 className="cbe-panel-title">Buildings</h2>
+      <input
+        className="cbe-lib-search"
+        type="search"
+        placeholder="Search buildings…"
+        aria-label="Search buildings"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+      />
+      {categories.length === 0 && <p className="cbe-muted">No buildings match “{query}”.</p>}
       {categories.map((category) => (
         <div key={category} className="cbe-lib-group">
           <div className="cbe-lib-category">{category}</div>

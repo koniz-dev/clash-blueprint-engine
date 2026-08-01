@@ -163,6 +163,56 @@ describe("VillageEditor batch operations", () => {
     expect(editor.village.buildingCount).toBe(1);
     expect(editor.village.wallCount).toBe(1);
   });
+
+  it("moves a wall preserving its id, reversibly", () => {
+    const editor = makeEditor();
+    editor.addWall({ x: 5, y: 5 });
+    const wallId = editor.village.listWalls()[0]?.id;
+
+    const moved = editor.moveWall(wallId!, { x: 8, y: 8 });
+    expect(moved.ok).toBe(true);
+    // Same id, new position (identity preserved — not a remove+add).
+    expect(editor.village.getWall(wallId!)?.position).toEqual({ x: 8, y: 8 });
+
+    editor.undo();
+    expect(editor.village.getWall(wallId!)?.position).toEqual({ x: 5, y: 5 });
+    editor.redo();
+    expect(editor.village.getWall(wallId!)?.position).toEqual({ x: 8, y: 8 });
+  });
+
+  it("surfaces an error Result on an illegal wall move and records nothing", () => {
+    const editor = makeEditor();
+    editor.addBuilding("cannon", { x: 10, y: 10 }); // occupies (10,10)…
+    editor.addWall({ x: 0, y: 0 });
+    const wallId = editor.village.listWalls()[0]?.id;
+
+    const moved = editor.moveWall(wallId!, { x: 10, y: 10 }); // onto the cannon
+    expect(moved.ok).toBe(false);
+    expect(editor.village.getWall(wallId!)?.position).toEqual({ x: 0, y: 0 });
+    // The failed command is not on the history.
+    expect(editor.history.undoLabel).toBe("Add wall");
+  });
+
+  it("moves a mixed building + wall selection in one atomic, undoable step", () => {
+    const editor = makeEditor();
+    const a = editor.addBuilding("cannon", { x: 10, y: 10 });
+    const idA = a.ok ? a.value : undefined;
+    editor.addWall({ x: 0, y: 0 });
+    const wallId = editor.village.listWalls()[0]?.id;
+
+    const moved = editor.moveEntities(
+      [{ id: idA!, to: { x: 12, y: 12 } }],
+      [{ id: wallId!, to: { x: 1, y: 1 } }],
+    );
+    expect(moved.ok).toBe(true);
+    expect(editor.village.getBuilding(idA!)?.position).toEqual({ x: 12, y: 12 });
+    expect(editor.village.getWall(wallId!)?.position).toEqual({ x: 1, y: 1 });
+
+    // One undo reverts both the building and the wall.
+    editor.undo();
+    expect(editor.village.getBuilding(idA!)?.position).toEqual({ x: 10, y: 10 });
+    expect(editor.village.getWall(wallId!)?.position).toEqual({ x: 0, y: 0 });
+  });
 });
 
 describe("VillageEditor persistence", () => {

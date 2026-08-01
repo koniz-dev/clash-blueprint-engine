@@ -43,5 +43,6 @@ export {
 } from "./application/commands/remove-building.js";
 export { AddWallCommand, type AddWallParams } from "./application/commands/add-wall.js";
 export { RemoveWallCommand, type RemoveWallParams } from "./application/commands/remove-wall.js";
+export { MoveWallCommand, type MoveWallParams } from "./application/commands/move-wall.js";
 export { MacroCommand } from "./application/commands/macro.js";
 export { VillageEditor, type VillageEditorOptions } from "./application/village-editor.js";

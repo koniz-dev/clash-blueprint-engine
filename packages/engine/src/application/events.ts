@@ -30,6 +30,12 @@ export type DomainEvent =
   | { readonly type: "BuildingDeleted"; readonly building: BuildingInstance }
   | { readonly type: "WallAdded"; readonly wall: WallSegment }
   | { readonly type: "WallRemoved"; readonly wall: WallSegment }
+  | {
+      readonly type: "WallMoved";
+      readonly id: WallId;
+      readonly from: GridVec;
+      readonly to: GridVec;
+    }
   | { readonly type: "LayoutLoaded"; readonly snapshot: VillageSnapshot }
   | {
       readonly type: "LayoutValidated";

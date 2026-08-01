@@ -8,6 +8,7 @@ export {
   type ViewMode,
 } from "./useEditor";
 export { EditorCanvas } from "./EditorCanvas";
+export { ConfirmDialog, type ConfirmDialogProps } from "./ConfirmDialog";
 export { ReplayPanel } from "./ReplayPanel";
 export { ShortcutsOverlay, type ShortcutsOverlayProps } from "./ShortcutsOverlay";
 export { SHORTCUTS, GESTURES, type Shortcut, type ShortcutGroup, type Gesture } from "./shortcuts";

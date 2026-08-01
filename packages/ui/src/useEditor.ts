@@ -126,6 +126,11 @@ export function useEditor(options: UseEditorOptions) {
   // In-UI help overlay + first-run hint (pure UI state).
   const [helpOpen, setHelpOpen] = useState(false);
   const [hintDismissed, setHintDismissed] = useState(true);
+  // Pending confirmation before an action that discards the current layout.
+  const [confirmPrompt, setConfirmPrompt] = useState<{
+    message: string;
+    onConfirm: () => void;
+  } | null>(null);
   const logId = useRef(0);
 
   const pushLog = useCallback((kind: LogEntry["kind"], message: string) => {
@@ -271,13 +276,18 @@ export function useEditor(options: UseEditorOptions) {
   const moveSelectedBy = useCallback(
     (dx: number, dy: number) => {
       if (dx === 0 && dy === 0) return;
-      const { buildingIds } = partitionSelection();
-      const moves = buildingIds.flatMap((id) => {
+      const { buildingIds, wallIds } = partitionSelection();
+      const buildingMoves = buildingIds.flatMap((id) => {
         const b = editor.village.getBuilding(id);
         return b ? [{ id, to: { x: b.position.x + dx, y: b.position.y + dy } }] : [];
       });
-      if (moves.length === 0) return;
-      const result = editor.moveBuildings(moves);
+      const wallMoves = wallIds.flatMap((id) => {
+        const w = editor.village.getWall(id);
+        return w ? [{ id, to: { x: w.position.x + dx, y: w.position.y + dy } }] : [];
+      });
+      if (buildingMoves.length === 0 && wallMoves.length === 0) return;
+      // One atomic gesture for a mixed building + wall selection.
+      const result = editor.moveEntities(buildingMoves, wallMoves);
       if (!result.ok) pushLog("error", describeEngineError(result.error));
     },
     [editor, partitionSelection, pushLog],
@@ -356,7 +366,27 @@ export function useEditor(options: UseEditorOptions) {
     resetPanels();
   }, [bump, resetPanels]);
 
-  const reset = useCallback(() => {
+  // Guard actions that discard the current layout: prompt only when there is
+  // something to lose (a non-empty layout); otherwise run immediately.
+  const guardDiscard = useCallback(
+    (message: string, action: () => void) => {
+      if (editor.village.buildingCount === 0 && editor.village.wallCount === 0) {
+        action();
+      } else {
+        setConfirmPrompt({ message, onConfirm: action });
+      }
+    },
+    [editor],
+  );
+  const confirmDiscard = useCallback(() => {
+    setConfirmPrompt((prompt) => {
+      prompt?.onConfirm();
+      return null;
+    });
+  }, []);
+  const cancelConfirm = useCallback(() => setConfirmPrompt(null), []);
+
+  const resetNow = useCallback(() => {
     editor.load({
       grid: editor.village.grid.toJSON(),
       tier: editor.village.tier,
@@ -366,6 +396,11 @@ export function useEditor(options: UseEditorOptions) {
     afterLoad();
     pushLog("info", "New layout");
   }, [editor, afterLoad, pushLog]);
+  const reset = useCallback(
+    () =>
+      guardDiscard("Start a new, empty layout? Your current layout will be discarded.", resetNow),
+    [guardDiscard, resetNow],
+  );
 
   /** Replace the whole layout with a loaded snapshot (import / template / restore). */
   const importSnapshot = useCallback(
@@ -384,23 +419,28 @@ export function useEditor(options: UseEditorOptions) {
   /** Parse a JSON blueprint (structural validation via the importer) and load it. */
   const importJson = useCallback(
     (text: string, source = "import") => {
+      // Parse first, so an invalid file is a plain error — never a discard prompt.
       const parsed = jsonImporter.import(text, source);
       if (!parsed.ok) {
         pushLog("error", `Import failed: ${parsed.error.issues.join("; ") || "invalid file"}`);
         return;
       }
-      importSnapshot(parsed.value, source);
+      guardDiscard(`Open “${source}”? Your current layout will be replaced.`, () =>
+        importSnapshot(parsed.value, source),
+      );
     },
-    [importSnapshot, pushLog],
+    [importSnapshot, guardDiscard, pushLog],
   );
 
   const loadTemplate = useCallback(
     (id: string) => {
       const template = options.templates?.find((t) => t.id === id);
       if (!template) return;
-      importSnapshot(template.snapshot, template.name);
+      guardDiscard(`Open “${template.name}”? Your current layout will be replaced.`, () =>
+        importSnapshot(template.snapshot, template.name),
+      );
     },
-    [options.templates, importSnapshot],
+    [options.templates, importSnapshot, guardDiscard],
   );
 
   // --- Queries (validation / analysis / AI, on demand) --------------------
@@ -693,6 +733,8 @@ export function useEditor(options: UseEditorOptions) {
     // Help overlay + first-run hint (UI state).
     helpOpen,
     hintDismissed,
+    // Pending discard confirmation (null when none).
+    confirmPrompt,
     // Attack replay view state.
     replay,
     replayTime,
@@ -745,6 +787,9 @@ export function useEditor(options: UseEditorOptions) {
       closeHelp,
       toggleHelp,
       dismissHelpHint,
+      // Discard confirmation.
+      confirmDiscard,
+      cancelConfirm,
     },
   };
 }

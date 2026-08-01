@@ -88,6 +88,31 @@ test.describe("Editor smoke", () => {
     await expect(page.getByText("WallRemoved").first()).toBeVisible();
   });
 
+  test("drags a wall to move it, and nudges it with arrow keys", async ({ page }) => {
+    await page.goto("/");
+
+    // Paint a wall, then switch to Select and grab it.
+    await page.getByRole("button", { name: "Wall", exact: true }).click();
+    const surface = page.locator(".cbe-canvas");
+    await surface.click({ position: { x: 360, y: 360 }, force: true });
+    await expect(page.getByText("WallAdded").first()).toBeVisible();
+
+    await page.getByRole("button", { name: "Select", exact: true }).click();
+    const box = await surface.boundingBox();
+    if (!box) throw new Error("canvas has no bounding box");
+
+    // Drag the wall two tiles right (a WallMoved command runs).
+    await page.mouse.move(box.x + 360, box.y + 360);
+    await page.mouse.down();
+    await page.mouse.move(box.x + 360 + 48, box.y + 360, { steps: 6 });
+    await page.mouse.up();
+    await expect(page.getByText("WallMoved").first()).toBeVisible();
+
+    // Arrow-key nudge also moves the (still-selected) wall.
+    await page.keyboard.press("ArrowDown");
+    await expect(page.getByText("WallMoved")).toHaveCount(2);
+  });
+
   test("opens a bundled template from the Open menu", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("button", { name: /^Open/ }).click();
@@ -161,6 +186,68 @@ test.describe("Editor smoke", () => {
     await surface.click({ position: { x: 260, y: 260 }, force: true });
     await page.keyboard.press("r");
     await expect(page.getByText("BuildingRotated").first()).toBeVisible();
+  });
+
+  test("confirms before discarding a non-empty layout when opening a template", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    // Put something on the board so there is work to lose.
+    await page
+      .getByRole("button", { name: /Cannon/ })
+      .first()
+      .click();
+    await page.locator(".cbe-canvas").click({ position: { x: 240, y: 240 }, force: true });
+    await expect(page.getByText("BuildingPlaced").first()).toBeVisible();
+
+    // Opening a template now prompts for confirmation.
+    const openTemplate = async (): Promise<void> => {
+      await page.getByRole("button", { name: /^Open/ }).click();
+      await page.getByRole("menuitem", { name: /Starter Base/ }).click();
+    };
+    await openTemplate();
+    const dialog = page.getByRole("alertdialog");
+    await expect(dialog).toBeVisible();
+
+    // Cancel keeps the current layout (nothing loaded).
+    await dialog.getByRole("button", { name: "Cancel" }).click();
+    await expect(page.getByRole("alertdialog")).toHaveCount(0);
+    await expect(page.getByText(/Loaded Starter Base/)).toHaveCount(0);
+
+    // Reopen and confirm — now it loads.
+    await openTemplate();
+    await page
+      .getByRole("alertdialog")
+      .getByRole("button", { name: /Discard/ })
+      .click();
+    await expect(page.getByText(/Loaded Starter Base/).first()).toBeVisible();
+  });
+
+  test("filters the building library via the search box", async ({ page }) => {
+    await page.goto("/");
+    // Both are present initially.
+    await expect(page.getByRole("button", { name: /Cannon/ }).first()).toBeVisible();
+    await expect(page.getByRole("button", { name: /Mortar/ }).first()).toBeVisible();
+
+    await page.getByRole("searchbox", { name: "Search buildings" }).fill("mortar");
+
+    // Only matching buildings remain in the library.
+    await expect(page.getByRole("button", { name: /Mortar/ }).first()).toBeVisible();
+    await expect(page.getByRole("button", { name: /Cannon/ })).toHaveCount(0);
+  });
+
+  test("shows a minimap that recenters the view on click", async ({ page }) => {
+    const errors: string[] = [];
+    page.on("pageerror", (e) => errors.push(String(e)));
+
+    await page.goto("/");
+    const minimap = page.getByRole("img", { name: /Minimap/ });
+    await expect(minimap).toBeVisible();
+
+    // Clicking the minimap pans the canvas (no crash, no domain change).
+    await minimap.click({ position: { x: 20, y: 20 } });
+    expect(errors).toEqual([]);
   });
 
   test("switches to the 3D view and mounts a WebGL canvas without crashing", async ({ page }) => {

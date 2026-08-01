@@ -61,9 +61,18 @@ Svelte hook, a CLI, or tests with no change to the core.
   undoable command (a multi-selection moves together as one `MacroCommand`).
   **Arrow keys** nudge the selection one tile at a time. Empty-space drag still
   draws a marquee; hold **Space** to pan.
-- **Selectable walls**: walls are selected (click or marquee), highlighted, and
-  removed through the same selection + **Delete/Backspace** flow as buildings
-  (buildings and walls delete together in one undoable step).
+- **Selectable & movable walls**: walls are selected (click or marquee),
+  highlighted, **dragged / arrow-nudged**, and deleted through the same
+  selection + command path as buildings. A mixed building + wall gesture is one
+  atomic, undoable step (`MoveWallCommand` preserves the wall's id; the facade's
+  `moveEntities` builds one `MacroCommand`).
+- **Drag aids**: while dragging, **alignment guides** appear where the moved
+  selection's edges/centres line up with other entities, and a **minimap**
+  (top-right) gives an overview of large layouts — click it to recenter the view
+  (pan only). The guide/hit geometry is a pure, unit-tested module
+  (`canvas-geometry.ts`).
+- **Library search**: a search box filters the building library by name or
+  category.
 - **Multi-select & clipboard**: shift-click to add/remove from the selection;
   **drag a marquee box** in the Select tool; **⌘/Ctrl+C / V** to copy & paste;
   **⌘/Ctrl+Z / Shift+Z** undo/redo. All via the same commands.
@@ -72,8 +81,11 @@ Svelte hook, a CLI, or tests with no change to the core.
   shortcuts overlay. See [Help & shortcuts](#help--shortcuts).
 - **Open & templates**: the toolbar's **Open ▾** menu loads a bundled **template**
   gallery or **imports a JSON** blueprint the user picks (parsed by the same
-  `jsonImporter` the CLI uses). The layout **autosaves** to `localStorage` and is
-  **restored** on the next visit (opt-in via a `persistKey`).
+  `jsonImporter` the CLI uses; invalid files surface as errors, never crashes).
+  When the current layout is non-empty, **New / Open / Import first ask for
+  confirmation** (`ConfirmDialog`) so work isn't silently discarded. The layout
+  **autosaves** to `localStorage` and is **restored** on the next visit (opt-in
+  via a `persistKey`).
 - **Attack replay**: the **Attack Replay** panel deploys troops (pick a troop,
   then click the canvas to drop attackers) and **plays a deterministic attack** —
   `simulateAttack` runs in `@clash/simulation`; the canvas animates the returned
