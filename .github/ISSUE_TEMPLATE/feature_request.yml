@@ -1,0 +1,29 @@
+name: Feature request
+description: Suggest a feature or improvement.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / motivation
+      description: What are you trying to do that's hard or impossible today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What you'd like to see. Note if it fits an existing port/plugin or is pure data.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: checkboxes
+    id: constraints
+    attributes:
+      label: Architecture fit
+      description: This project keeps game logic out of React and the core framework-free.
+      options:
+        - label: This can be done without putting game logic in React or a framework dependency in a core package.

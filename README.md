@@ -1,6 +1,8 @@
 # Clash Blueprint Engine
 
 [![CI](https://github.com/koniz-dev/clash-blueprint-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/koniz-dev/clash-blueprint-engine/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/koniz-dev/clash-blueprint-engine/actions/workflows/codeql.yml/badge.svg)](https://github.com/koniz-dev/clash-blueprint-engine/actions/workflows/codeql.yml)
+[![API docs](https://img.shields.io/badge/docs-API%20reference-blue)](https://koniz-dev.github.io/clash-blueprint-engine/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 A production-grade, **framework-independent**, **game-agnostic** engine for
@@ -55,12 +57,20 @@ GitHub Actions workflow running all of it.
   facade — **no game logic in components**.
 - `examples/pipeline` — an end-to-end integration test over the real `data/`.
 
+The **generated API reference** is published to GitHub Pages:
+**<https://koniz-dev.github.io/clash-blueprint-engine/>** (run it locally with
+`pnpm docs:api`).
+
 See [docs/ROADMAP.md](docs/ROADMAP.md) for the remaining phase, and the design
 guides: [ARCHITECTURE](docs/ARCHITECTURE.md) ·
 [RULES_ENGINE](docs/RULES_ENGINE.md) ·
 [RENDERING_AND_PLUGINS](docs/RENDERING_AND_PLUGINS.md) ·
 [ANALYZER](docs/ANALYZER.md) · [SIMULATION](docs/SIMULATION.md) ·
-[AI](docs/AI.md) · [EDITOR](docs/EDITOR.md) · [GAME_PACKS](docs/GAME_PACKS.md).
+[AI](docs/AI.md) · [EDITOR](docs/EDITOR.md) · [GAME_PACKS](docs/GAME_PACKS.md) ·
+[SAVE_FORMAT](docs/SAVE_FORMAT.md).
+
+Project meta: [CHANGELOG](CHANGELOG.md) · [CONTRIBUTING](CONTRIBUTING.md) ·
+[SECURITY](SECURITY.md).
 
 ## Quick start
 

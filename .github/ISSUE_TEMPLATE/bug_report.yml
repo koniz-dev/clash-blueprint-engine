@@ -1,0 +1,44 @@
+name: Bug report
+description: Report a problem with the engine, editor, or a game pack.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to file a bug! Please fill out the sections below.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug and what you expected instead.
+      placeholder: When I drag a wall onto a building, …
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps (or a failing test / layout JSON) that reproduce it.
+      placeholder: |
+        1. Open the editor
+        2. …
+    validations:
+      required: true
+  - type: input
+    id: package
+    attributes:
+      label: Affected package / area
+      description: e.g. "@clash/engine", "@clash/ui editor", "clash-of-clans data pack"
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: OS, Node version, browser (for the editor), and the commit / version.
+      placeholder: macOS 14, Node 22.9, Chrome 130, commit abc1234
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues and this isn't a duplicate.
+          required: true
+        - label: This is reproducible on the latest `main`.
