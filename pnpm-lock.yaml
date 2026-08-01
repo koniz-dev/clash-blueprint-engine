@@ -356,11 +356,11 @@ importers:
         specifier: ^8.17.10
         version: 8.18.0(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.185.1)
       konva:
-        specifier: ^9.3.16
-        version: 9.3.22
+        specifier: ^10.3.0
+        version: 10.3.0
       react-konva:
         specifier: ^18.2.10
-        version: 18.2.16(@types/react@18.3.31)(konva@9.3.22)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 18.2.16(@types/react@18.3.31)(konva@10.3.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       three:
         specifier: ^0.185.1
         version: 0.185.1
@@ -2357,8 +2357,8 @@ packages:
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
 
-  konva@9.3.22:
-    resolution: {integrity: sha512-yQI5d1bmELlD/fowuyfOp9ff+oamg26WOCkyqUyc+nczD/lhRa3EvD2MZOoc4c1293TAubW9n34fSQLgSeEgSw==}
+  konva@10.3.0:
+    resolution: {integrity: sha512-gt19K2gzY4lHbnkvsku7eSmB+A9PTS2jG4F9coBMsdjM1UKfJNxJbDbXVpeCW1wjEGRwBD3nBamcHnqJhAeKlg==}
 
   levn@0.4.1:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
@@ -5164,7 +5164,7 @@ snapshots:
     dependencies:
       json-buffer: 3.0.1
 
-  konva@9.3.22: {}
+  konva@10.3.0: {}
 
   levn@0.4.1:
     dependencies:
@@ -5490,11 +5490,11 @@ snapshots:
 
   react-is@17.0.2: {}
 
-  react-konva@18.2.16(@types/react@18.3.31)(konva@9.3.22)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  react-konva@18.2.16(@types/react@18.3.31)(konva@10.3.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@types/react-reconciler': 0.28.9(@types/react@18.3.31)
       its-fine: 1.2.5(@types/react@18.3.31)(react@18.3.1)
-      konva: 9.3.22
+      konva: 10.3.0
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       react-reconciler: 0.29.2(react@18.3.1)
