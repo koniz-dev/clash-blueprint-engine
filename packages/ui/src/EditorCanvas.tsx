@@ -393,15 +393,11 @@ export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.El
           {scene.buildings.map((b) => {
             const selected = controller.selectedIds.includes(b.id);
             const destroyed = replayState?.destroyedBuildingIds.has(b.id) ?? false;
-            // Live rule feedback: outline rule-violating buildings (error/warning).
+            // Live rule feedback colours the building's own border; selection is a
+            // separate outer ring, so a selected building still shows its violation.
             const severity = controller.liveValidation.severityById.get(b.id);
-            const stroke = selected
-              ? "#ffd600"
-              : severity === "error"
-                ? RULE_ERROR
-                : severity === "warning"
-                  ? RULE_WARNING
-                  : "#263238";
+            const stroke =
+              severity === "error" ? RULE_ERROR : severity === "warning" ? RULE_WARNING : "#263238";
             return (
               <Group key={b.id} opacity={destroyed ? 0.25 : 1}>
                 <Rect
@@ -413,8 +409,20 @@ export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.El
                   fill={destroyed ? "#5a5a5a" : categoryColor(b.category)}
                   opacity={0.9}
                   stroke={stroke}
-                  strokeWidth={selected || severity ? 3 : 1}
+                  strokeWidth={severity ? 3 : 1}
                 />
+                {selected && (
+                  <Rect
+                    x={b.bounds.x * TILE - 2}
+                    y={b.bounds.y * TILE - 2}
+                    width={b.bounds.width * TILE + 4}
+                    height={b.bounds.height * TILE + 4}
+                    cornerRadius={4}
+                    stroke="#ffd600"
+                    strokeWidth={2}
+                    listening={false}
+                  />
+                )}
                 <Text
                   x={b.bounds.x * TILE}
                   y={b.bounds.y * TILE}
