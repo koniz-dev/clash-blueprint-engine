@@ -5,3 +5,7 @@ packages:
 allowBuilds:
   esbuild: true
   sharp: false
+overrides:
+  # vitest 4 imports `vite/module-runner` (vite 6+); pin vite so every package's
+  # test runner and the Storybook/UI build share one modern vite.
+  vite: ^8.1.5
