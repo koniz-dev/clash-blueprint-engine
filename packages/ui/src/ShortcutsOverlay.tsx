@@ -1,7 +1,14 @@
 import { useEffect, useRef } from "react";
+import { useI18n, type MessageKey } from "./i18n";
 import { formatCombo, type Gesture, type Shortcut, type ShortcutGroup } from "./shortcuts";
 
 const GROUP_ORDER: ShortcutGroup[] = ["Edit", "Selection", "Tools", "View"];
+const GROUP_KEY: Record<ShortcutGroup, MessageKey> = {
+  Edit: "group.Edit",
+  Selection: "group.Selection",
+  Tools: "group.Tools",
+  View: "group.View",
+};
 
 export interface ShortcutsOverlayProps {
   readonly open: boolean;
@@ -33,6 +40,7 @@ export function ShortcutsOverlay({
   gestures,
   isMac = detectMac(),
 }: ShortcutsOverlayProps): JSX.Element | null {
+  const { t } = useI18n();
   const panelRef = useRef<HTMLDivElement | null>(null);
   const previouslyFocused = useRef<HTMLElement | null>(null);
 
@@ -90,20 +98,24 @@ export function ShortcutsOverlay({
       >
         <div className="cbe-overlay-head">
           <h2 id="cbe-overlay-title" className="cbe-panel-title">
-            Keyboard shortcuts
+            {t("help.title")}
           </h2>
-          <button className="cbe-btn cbe-btn-small" onClick={onClose} aria-label="Close shortcuts">
-            Close ✕
+          <button
+            className="cbe-btn cbe-btn-small"
+            onClick={onClose}
+            aria-label={t("help.closeAria")}
+          >
+            {t("help.close")} ✕
           </button>
         </div>
 
         <div className="cbe-overlay-body">
           {groups.map(({ group, items }) => (
-            <section key={group} className="cbe-overlay-group" aria-label={group}>
-              <h3 className="cbe-overlay-group-title">{group}</h3>
+            <section key={group} className="cbe-overlay-group" aria-label={t(GROUP_KEY[group])}>
+              <h3 className="cbe-overlay-group-title">{t(GROUP_KEY[group])}</h3>
               {items.map((s) => (
                 <div key={s.id} className="cbe-overlay-row">
-                  <span>{s.label}</span>
+                  <span>{t(s.label)}</span>
                   <span className="cbe-keys">
                     {s.keys.map((combo, i) => (
                       <kbd key={i} className="cbe-kbd">
@@ -116,13 +128,13 @@ export function ShortcutsOverlay({
             </section>
           ))}
 
-          <section className="cbe-overlay-group" aria-label="Mouse">
-            <h3 className="cbe-overlay-group-title">Mouse</h3>
+          <section className="cbe-overlay-group" aria-label={t("help.mouse")}>
+            <h3 className="cbe-overlay-group-title">{t("help.mouse")}</h3>
             {gestures.map((g) => (
               <div key={g.label} className="cbe-overlay-row">
-                <span>{g.hint}</span>
+                <span>{t(g.hint)}</span>
                 <span className="cbe-keys">
-                  <kbd className="cbe-kbd">{g.label}</kbd>
+                  <kbd className="cbe-kbd">{t(g.label)}</kbd>
                 </span>
               </div>
             ))}

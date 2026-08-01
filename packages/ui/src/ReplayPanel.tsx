@@ -19,21 +19,21 @@ export function ReplayPanel({ controller }: { controller: EditorController }): J
 
       {!replay ? (
         <div className="cbe-replay">
-          <p className="cbe-muted">Deploy troops, then play a deterministic attack.</p>
+          <p className="cbe-muted">{t("replay.intro")}</p>
 
           <div className="cbe-replay-troops">
-            {controller.troopRoster.map((t) => (
+            {controller.troopRoster.map((troop) => (
               <button
-                key={t.id}
+                key={troop.id}
                 className={`cbe-btn cbe-btn-small ${
-                  controller.deployTroopId === t.id ? "cbe-btn-active" : ""
+                  controller.deployTroopId === troop.id ? "cbe-btn-active" : ""
                 }`}
                 onClick={() => {
-                  actions.setDeployTroopId(t.id);
+                  actions.setDeployTroopId(troop.id);
                   actions.setDeployMode(true);
                 }}
               >
-                {t.name}
+                {troop.name}
               </button>
             ))}
           </div>
@@ -43,15 +43,17 @@ export function ReplayPanel({ controller }: { controller: EditorController }): J
               className={`cbe-btn ${controller.deployMode ? "cbe-btn-active" : ""}`}
               onClick={() => actions.setDeployMode(!controller.deployMode)}
             >
-              {controller.deployMode ? "Deploying…" : "Deploy"}
+              {controller.deployMode ? t("replay.deploying") : t("replay.deploy")}
             </button>
-            <span className="cbe-muted">{controller.deployments.length} placed</span>
+            <span className="cbe-muted">
+              {t("replay.placed", { count: controller.deployments.length })}
+            </span>
             <button
               className="cbe-btn cbe-btn-small"
               onClick={actions.clearDeployments}
               disabled={controller.deployments.length === 0}
             >
-              Clear
+              {t("replay.clear")}
             </button>
           </div>
 
@@ -60,13 +62,13 @@ export function ReplayPanel({ controller }: { controller: EditorController }): J
             onClick={actions.runReplay}
             disabled={controller.deployments.length === 0}
           >
-            ▶ Play Attack
+            {t("replay.play")}
           </button>
         </div>
       ) : (
         <div className="cbe-replay">
           <div className="cbe-kv">
-            <span>Result</span>
+            <span>{t("replay.result")}</span>
             <b>
               {replay.stars}★ · {replay.destructionPercent}%
             </b>
@@ -74,7 +76,7 @@ export function ReplayPanel({ controller }: { controller: EditorController }): J
 
           <div className="cbe-replay-row">
             <button className="cbe-btn" onClick={actions.toggleReplayPlaying}>
-              {controller.replayPlaying ? "⏸ Pause" : "▶ Play"}
+              {controller.replayPlaying ? t("replay.pause") : t("replay.resume")}
             </button>
             <span className="cbe-muted">
               {controller.replayTime.toFixed(1)}s / {controller.replayDuration.toFixed(1)}s
@@ -89,7 +91,7 @@ export function ReplayPanel({ controller }: { controller: EditorController }): J
             step={0.05}
             value={controller.replayTime}
             onChange={(e) => actions.seekReplay(Number(e.target.value))}
-            aria-label="Replay time"
+            aria-label={t("replay.time")}
           />
 
           <div className="cbe-replay-row">
@@ -105,7 +107,7 @@ export function ReplayPanel({ controller }: { controller: EditorController }): J
               </button>
             ))}
             <button className="cbe-btn cbe-btn-small" onClick={actions.exitReplay}>
-              Exit
+              {t("replay.exit")}
             </button>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useI18n } from "./i18n";
 import type { EditorController } from "./useEditor";
 
 /**
@@ -8,6 +9,7 @@ import type { EditorController } from "./useEditor";
  * `useEditor`, never here.
  */
 export function OpenMenu({ controller }: { controller: EditorController }): JSX.Element {
+  const { t } = useI18n();
   const { templates, actions } = controller;
   const [open, setOpen] = useState(false);
   const fileRef = useRef<HTMLInputElement | null>(null);
@@ -29,34 +31,36 @@ export function OpenMenu({ controller }: { controller: EditorController }): JSX.
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
       >
-        Open ▾
+        {t("open.button")} ▾
       </button>
       {open && (
         <>
           {/* Click-away backdrop. */}
           <div className="cbe-menu-backdrop" onClick={() => setOpen(false)} />
           <div className="cbe-menu-panel" role="menu">
-            {templates.length > 0 && <div className="cbe-menu-section">Templates</div>}
-            {templates.map((t) => (
+            {templates.length > 0 && (
+              <div className="cbe-menu-section">{t("open.templates")}</div>
+            )}
+            {templates.map((tpl) => (
               <button
-                key={t.id}
+                key={tpl.id}
                 className="cbe-menu-item"
                 role="menuitem"
                 onClick={() => {
-                  actions.loadTemplate(t.id);
+                  actions.loadTemplate(tpl.id);
                   setOpen(false);
                 }}
               >
-                {t.name}
+                {tpl.name}
               </button>
             ))}
-            <div className="cbe-menu-section">File</div>
+            <div className="cbe-menu-section">{t("open.file")}</div>
             <button
               className="cbe-menu-item"
               role="menuitem"
               onClick={() => fileRef.current?.click()}
             >
-              Import JSON…
+              {t("open.import")}
             </button>
             <input
               ref={fileRef}

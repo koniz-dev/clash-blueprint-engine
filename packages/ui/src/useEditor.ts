@@ -245,10 +245,7 @@ export function useEditor(options: UseEditorOptions) {
   }, [editor, afterLoad, pushLog]);
   const reset = useCallback(
     () =>
-      guard.guardDiscard(
-        "Start a new, empty layout? Your current layout will be discarded.",
-        resetNow,
-      ),
+      guard.guardDiscard("discard.new", resetNow),
     [guard, resetNow],
   );
 
@@ -275,9 +272,9 @@ export function useEditor(options: UseEditorOptions) {
         pushLog("error", `Import failed: ${parsed.error.issues.join("; ") || "invalid file"}`);
         return;
       }
-      guard.guardDiscard(`Open “${source}”? Your current layout will be replaced.`, () =>
-        importSnapshot(parsed.value, source),
-      );
+      guard.guardDiscard("discard.open", () => importSnapshot(parsed.value, source), {
+        name: source,
+      });
     },
     [importSnapshot, guard, pushLog],
   );
@@ -286,9 +283,9 @@ export function useEditor(options: UseEditorOptions) {
     (id: string) => {
       const template = options.templates?.find((t) => t.id === id);
       if (!template) return;
-      guard.guardDiscard(`Open “${template.name}”? Your current layout will be replaced.`, () =>
-        importSnapshot(template.snapshot, template.name),
-      );
+      guard.guardDiscard("discard.open", () => importSnapshot(template.snapshot, template.name), {
+        name: template.name,
+      });
     },
     [options.templates, importSnapshot, guard],
   );

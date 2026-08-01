@@ -11,7 +11,7 @@ describe("useDiscardGuard", () => {
     const { result } = renderHook(() => useDiscardGuard(editor));
     const action = vi.fn();
 
-    act(() => result.current.guardDiscard("discard?", action));
+    act(() => result.current.guardDiscard("discard.new", action));
     expect(action).toHaveBeenCalledTimes(1);
     expect(result.current.confirmPrompt).toBeNull();
   });
@@ -22,9 +22,9 @@ describe("useDiscardGuard", () => {
     const { result } = renderHook(() => useDiscardGuard(editor));
     const action = vi.fn();
 
-    act(() => result.current.guardDiscard("discard?", action));
+    act(() => result.current.guardDiscard("discard.new", action));
     expect(action).not.toHaveBeenCalled();
-    expect(result.current.confirmPrompt?.message).toBe("discard?");
+    expect(result.current.confirmPrompt?.messageKey).toBe("discard.new");
 
     // Cancel clears without running.
     act(() => result.current.cancelConfirm());
@@ -32,7 +32,7 @@ describe("useDiscardGuard", () => {
     expect(action).not.toHaveBeenCalled();
 
     // Re-stage, then confirm runs the action and clears.
-    act(() => result.current.guardDiscard("discard?", action));
+    act(() => result.current.guardDiscard("discard.new", action));
     act(() => result.current.confirmDiscard());
     expect(action).toHaveBeenCalledTimes(1);
     expect(result.current.confirmPrompt).toBeNull();

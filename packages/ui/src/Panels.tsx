@@ -1,5 +1,5 @@
 import { categoryColor } from "@clash/renderer";
-import { useI18n } from "./i18n";
+import { categoryMessageKey, useI18n } from "./i18n";
 import type { EditorController } from "./useEditor";
 
 export function Inspector({ controller }: { controller: EditorController }): JSX.Element {
@@ -14,46 +14,43 @@ export function Inspector({ controller }: { controller: EditorController }): JSX
       <h2 className="cbe-panel-title">{t("panel.inspector")}</h2>
       {controller.selectedIds.length > 1 ? (
         <div className="cbe-inspector">
-          <p>{controller.selectedIds.length} buildings selected.</p>
+          <p>{t("inspector.multiSelected", { count: controller.selectedIds.length })}</p>
           <div className="cbe-inspector-actions">
             <button className="cbe-btn" onClick={controller.actions.copySelection}>
-              Copy
+              {t("action.copy")}
             </button>
             <button className="cbe-btn cbe-btn-danger" onClick={controller.actions.deleteSelected}>
-              Delete all
+              {t("action.deleteAll")}
             </button>
           </div>
         </div>
       ) : !building ? (
-        <p className="cbe-muted">
-          Select a building to inspect it. Shift-click to multi-select; ⌘/Ctrl+C / V to copy &amp;
-          paste.
-        </p>
+        <p className="cbe-muted">{t("inspector.empty")}</p>
       ) : (
         <div className="cbe-inspector">
           <div className="cbe-kv">
-            <span>Name</span>
+            <span>{t("inspector.name")}</span>
             <b>{sceneBuilding?.name ?? building.definitionId}</b>
           </div>
           <div className="cbe-kv">
-            <span>Position</span>
+            <span>{t("inspector.position")}</span>
             <b>
               {building.position.x}, {building.position.y}
             </b>
           </div>
           <div className="cbe-kv">
-            <span>Rotation</span>
+            <span>{t("inspector.rotation")}</span>
             <b>{building.rotation}°</b>
           </div>
           <div className="cbe-inspector-actions">
             <button className="cbe-btn" onClick={controller.actions.rotateSelected}>
-              Rotate
+              {t("action.rotate")}
             </button>
             <button className="cbe-btn" onClick={controller.actions.copySelection}>
-              Copy
+              {t("action.copy")}
             </button>
             <button className="cbe-btn cbe-btn-danger" onClick={controller.actions.deleteSelected}>
-              Delete
+              {t("action.delete")}
             </button>
           </div>
         </div>
@@ -72,11 +69,11 @@ export function StatsPanel({ controller }: { controller: EditorController }): JS
     <div className="cbe-panel">
       <h2 className="cbe-panel-title">{t("panel.stats")}</h2>
       <div className="cbe-kv">
-        <span>Buildings</span>
+        <span>{t("stats.buildings")}</span>
         <b>{scene.buildings.length}</b>
       </div>
       <div className="cbe-kv">
-        <span>Walls</span>
+        <span>{t("stats.walls")}</span>
         <b>{scene.walls.length}</b>
       </div>
       <div className="cbe-kv">
@@ -84,11 +81,14 @@ export function StatsPanel({ controller }: { controller: EditorController }): JS
         <b>{scene.tier}</b>
       </div>
       <div className="cbe-chiprow">
-        {[...byCategory.entries()].map(([cat, n]) => (
-          <span key={cat} className="cbe-chip" style={{ borderColor: categoryColor(cat) }}>
-            {cat}: {n}
-          </span>
-        ))}
+        {[...byCategory.entries()].map(([cat, n]) => {
+          const key = categoryMessageKey(cat);
+          return (
+            <span key={cat} className="cbe-chip" style={{ borderColor: categoryColor(cat) }}>
+              {key ? t(key) : cat}: {n}
+            </span>
+          );
+        })}
       </div>
     </div>
   );
@@ -101,9 +101,9 @@ export function ValidationPanel({ controller }: { controller: EditorController }
     <div className="cbe-panel">
       <h2 className="cbe-panel-title">{t("panel.validation")}</h2>
       {!report ? (
-        <p className="cbe-muted">Run “Validate” to check the layout.</p>
+        <p className="cbe-muted">{t("validation.empty")}</p>
       ) : report.issues.length === 0 ? (
-        <p className="cbe-ok">No issues — layout is valid.</p>
+        <p className="cbe-ok">{t("validation.ok")}</p>
       ) : (
         <ul className="cbe-issues">
           {report.issues.map((issue, i) => (
@@ -125,7 +125,7 @@ export function AnalysisPanel({ controller }: { controller: EditorController }):
     <div className="cbe-panel">
       <h2 className="cbe-panel-title">{t("panel.analysis")}</h2>
       {!score ? (
-        <p className="cbe-muted">Run “Analyze” for a defensive breakdown.</p>
+        <p className="cbe-muted">{t("analysis.empty")}</p>
       ) : (
         <div>
           <div className="cbe-score">
@@ -159,11 +159,11 @@ export function AiPanel({ controller }: { controller: EditorController }): JSX.E
     <div className="cbe-panel">
       <h2 className="cbe-panel-title">{t("panel.ai")}</h2>
       {controller.aiLoading ? (
-        <p className="cbe-muted">Analyzing (simulating attacks)…</p>
+        <p className="cbe-muted">{t("ai.loading")}</p>
       ) : !report ? (
-        <p className="cbe-muted">Run “AI Suggest” for ranked improvements.</p>
+        <p className="cbe-muted">{t("ai.empty")}</p>
       ) : report.recommendations.length === 0 ? (
-        <p className="cbe-ok">No improvements found — solid base!</p>
+        <p className="cbe-ok">{t("ai.none")}</p>
       ) : (
         <ul className="cbe-recs">
           {report.recommendations.map((rec) => {
@@ -181,7 +181,7 @@ export function AiPanel({ controller }: { controller: EditorController }): JSX.E
                     className="cbe-btn cbe-btn-small"
                     onClick={() => controller.actions.applyMove(action.buildingId, action.to)}
                   >
-                    Apply move
+                    {t("ai.applyMove")}
                   </button>
                 )}
               </li>

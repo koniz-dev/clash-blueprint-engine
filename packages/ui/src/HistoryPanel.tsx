@@ -33,7 +33,7 @@ export function HistoryPanel({ controller }: { controller: EditorController }): 
     <div className="cbe-panel">
       <h2 className="cbe-panel-title">{t("panel.history")}</h2>
       {isEmpty ? (
-        <p className="cbe-muted">No actions yet — place a building to start.</p>
+        <p className="cbe-muted">{t("history.empty")}</p>
       ) : (
         <ol className="cbe-history">
           {rows.map((row) => (

@@ -1,3 +1,4 @@
+import type { MessageKey } from "./i18n";
 import type { Tool } from "./useEditor";
 
 /**
@@ -5,7 +6,7 @@ import type { Tool } from "./useEditor";
  * `useEditor` dispatches from this list, and the help overlay + toolbar tooltips
  * render from it — so a binding is defined exactly once and the two can never
  * drift. This module is pure presentation/config: it imports no engine or domain
- * code (only the `Tool` string-union type, which is erased at runtime).
+ * code — only UI-layer types (`Tool`, `MessageKey`), which are erased at runtime.
  */
 
 export type ShortcutGroup = "Edit" | "Selection" | "Tools" | "View";
@@ -38,7 +39,8 @@ export interface ShortcutContext {
 
 export interface Shortcut {
   readonly id: string;
-  readonly label: string;
+  /** i18n key for the human label (rendered, translated, in the help overlay). */
+  readonly label: MessageKey;
   readonly group: ShortcutGroup;
   readonly keys: readonly KeyCombo[];
   /** Whether a match calls `preventDefault()` (matches the original handler). */
@@ -67,7 +69,7 @@ export const SHORTCUTS: readonly Shortcut[] = [
   // --- Edit ---------------------------------------------------------------
   {
     id: "undo",
-    label: "Undo",
+    label: "shortcut.undo",
     group: "Edit",
     keys: [{ key: "z", mod: true, shift: false }],
     preventDefault: true,
@@ -75,7 +77,7 @@ export const SHORTCUTS: readonly Shortcut[] = [
   },
   {
     id: "redo",
-    label: "Redo",
+    label: "shortcut.redo",
     group: "Edit",
     keys: [
       { key: "z", mod: true, shift: true },
@@ -86,14 +88,14 @@ export const SHORTCUTS: readonly Shortcut[] = [
   },
   {
     id: "copy",
-    label: "Copy selection",
+    label: "shortcut.copy",
     group: "Edit",
     keys: [{ key: "c", mod: true }],
     run: (c) => c.copy(),
   },
   {
     id: "paste",
-    label: "Paste",
+    label: "shortcut.paste",
     group: "Edit",
     keys: [{ key: "v", mod: true }],
     run: (c) => c.paste(),
@@ -102,7 +104,7 @@ export const SHORTCUTS: readonly Shortcut[] = [
   // --- Selection ----------------------------------------------------------
   {
     id: "delete-selection",
-    label: "Delete selection",
+    label: "shortcut.delete-selection",
     group: "Selection",
     keys: [{ key: "delete" }, { key: "backspace" }],
     preventDefault: true,
@@ -111,7 +113,7 @@ export const SHORTCUTS: readonly Shortcut[] = [
   },
   {
     id: "nudge",
-    label: "Nudge selection",
+    label: "shortcut.nudge",
     group: "Selection",
     keys: [{ key: "arrowup" }, { key: "arrowdown" }, { key: "arrowleft" }, { key: "arrowright" }],
     preventDefault: true,
@@ -123,7 +125,7 @@ export const SHORTCUTS: readonly Shortcut[] = [
   },
   {
     id: "rotate",
-    label: "Rotate selection",
+    label: "shortcut.rotate",
     group: "Selection",
     keys: [{ key: "r", mod: false }],
     run: (c) => c.rotate(),
@@ -132,7 +134,7 @@ export const SHORTCUTS: readonly Shortcut[] = [
   // --- Tools (letter + mirrored number) -----------------------------------
   {
     id: "tool-select",
-    label: "Select tool",
+    label: "shortcut.tool-select",
     group: "Tools",
     keys: [
       { key: "v", mod: false },
@@ -142,7 +144,7 @@ export const SHORTCUTS: readonly Shortcut[] = [
   },
   {
     id: "tool-place",
-    label: "Place tool",
+    label: "shortcut.tool-place",
     group: "Tools",
     keys: [
       { key: "p", mod: false },
@@ -152,7 +154,7 @@ export const SHORTCUTS: readonly Shortcut[] = [
   },
   {
     id: "tool-wall",
-    label: "Wall tool",
+    label: "shortcut.tool-wall",
     group: "Tools",
     keys: [
       { key: "w", mod: false },
@@ -162,7 +164,7 @@ export const SHORTCUTS: readonly Shortcut[] = [
   },
   {
     id: "tool-delete",
-    label: "Delete tool",
+    label: "shortcut.tool-delete",
     group: "Tools",
     keys: [
       { key: "d", mod: false },
@@ -172,7 +174,7 @@ export const SHORTCUTS: readonly Shortcut[] = [
   },
   {
     id: "tool-hand",
-    label: "Hand tool (pan)",
+    label: "shortcut.tool-hand",
     group: "Tools",
     keys: [
       { key: "h", mod: false },
@@ -184,7 +186,7 @@ export const SHORTCUTS: readonly Shortcut[] = [
   // --- View ---------------------------------------------------------------
   {
     id: "help",
-    label: "Show shortcuts",
+    label: "shortcut.help",
     group: "View",
     keys: [{ key: "/", mod: false, shift: true }],
     preventDefault: true,
@@ -194,15 +196,17 @@ export const SHORTCUTS: readonly Shortcut[] = [
 
 /** Mouse/pointer gestures — shown alongside the key shortcuts (display only). */
 export interface Gesture {
-  readonly label: string;
-  readonly hint: string;
+  /** i18n key for the trigger (e.g. "Drag a building"). */
+  readonly label: MessageKey;
+  /** i18n key for the effect (e.g. "Move it"). */
+  readonly hint: MessageKey;
 }
 export const GESTURES: readonly Gesture[] = [
-  { label: "Drag (empty space)", hint: "Marquee-select" },
-  { label: "Drag a building", hint: "Move it (one undo)" },
-  { label: "Shift + click", hint: "Add / remove from selection" },
-  { label: "Space + drag", hint: "Pan the canvas" },
-  { label: "Mouse wheel", hint: "Zoom around the cursor" },
+  { label: "gesture.marquee.label", hint: "gesture.marquee.hint" },
+  { label: "gesture.move.label", hint: "gesture.move.hint" },
+  { label: "gesture.shift.label", hint: "gesture.shift.hint" },
+  { label: "gesture.pan.label", hint: "gesture.pan.hint" },
+  { label: "gesture.wheel.label", hint: "gesture.wheel.hint" },
 ];
 
 /** A keyboard-event-like shape — the real `KeyboardEvent` satisfies it. */

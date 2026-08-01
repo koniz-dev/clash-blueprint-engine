@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useI18n } from "./i18n";
 
 export interface ConfirmDialogProps {
   readonly open: boolean;
@@ -18,11 +19,12 @@ export interface ConfirmDialogProps {
 export function ConfirmDialog({
   open,
   message,
-  confirmLabel = "Discard & continue",
-  cancelLabel = "Cancel",
+  confirmLabel,
+  cancelLabel,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps): JSX.Element | null {
+  const { t } = useI18n();
   const cancelRef = useRef<HTMLButtonElement | null>(null);
   const confirmRef = useRef<HTMLButtonElement | null>(null);
   const previouslyFocused = useRef<HTMLElement | null>(null);
@@ -64,10 +66,10 @@ export function ConfirmDialog({
         </p>
         <div className="cbe-confirm-actions">
           <button ref={cancelRef} className="cbe-btn" onClick={onCancel}>
-            {cancelLabel}
+            {cancelLabel ?? t("confirm.cancel")}
           </button>
           <button ref={confirmRef} className="cbe-btn cbe-btn-danger" onClick={onConfirm}>
-            {confirmLabel}
+            {confirmLabel ?? t("confirm.discard")}
           </button>
         </div>
       </div>

@@ -45,6 +45,117 @@ export const en = {
   "panel.analysis": "Defense Score",
   "panel.ai": "AI Suggestions",
   "panel.log": "Event Log",
+
+  "app.loading3d": "Loading 3D view…",
+
+  // Shared action buttons
+  "action.copy": "Copy",
+  "action.delete": "Delete",
+  "action.deleteAll": "Delete all",
+  "action.rotate": "Rotate",
+
+  // Inspector
+  "inspector.multiSelected": "{count} buildings selected.",
+  "inspector.empty":
+    "Select a building to inspect it. Shift-click to multi-select; ⌘/Ctrl+C / V to copy & paste.",
+  "inspector.name": "Name",
+  "inspector.position": "Position",
+  "inspector.rotation": "Rotation",
+
+  // Statistics
+  "stats.buildings": "Buildings",
+  "stats.walls": "Walls",
+
+  // Validation
+  "validation.empty": "Run “Validate” to check the layout.",
+  "validation.ok": "No issues — layout is valid.",
+
+  // Defense score
+  "analysis.empty": "Run “Analyze” for a defensive breakdown.",
+
+  // AI suggestions
+  "ai.loading": "Analyzing (simulating attacks)…",
+  "ai.empty": "Run “AI Suggest” for ranked improvements.",
+  "ai.none": "No improvements found — solid base!",
+  "ai.applyMove": "Apply move",
+
+  // History
+  "history.empty": "No actions yet — place a building to start.",
+
+  // Attack replay
+  "replay.intro": "Deploy troops, then play a deterministic attack.",
+  "replay.deploy": "Deploy",
+  "replay.deploying": "Deploying…",
+  "replay.placed": "{count} placed",
+  "replay.clear": "Clear",
+  "replay.play": "▶ Play Attack",
+  "replay.result": "Result",
+  "replay.pause": "⏸ Pause",
+  "replay.resume": "▶ Play",
+  "replay.time": "Replay time",
+  "replay.exit": "Exit",
+
+  // Open menu
+  "open.button": "Open",
+  "open.templates": "Templates",
+  "open.file": "File",
+  "open.import": "Import JSON…",
+
+  // Confirm dialog
+  "confirm.discard": "Discard & continue",
+  "confirm.cancel": "Cancel",
+  "discard.new": "Start a new layout? Your current layout will be replaced.",
+  "discard.open": "Open “{name}”? Your current layout will be replaced.",
+
+  // Building library
+  "library.search": "Search buildings…",
+  "library.noMatch": "No buildings match “{query}”.",
+
+  // Help overlay
+  "help.title": "Keyboard shortcuts",
+  "help.close": "Close",
+  "help.closeAria": "Close shortcuts",
+  "help.mouse": "Mouse",
+  "group.Edit": "Edit",
+  "group.Selection": "Selection",
+  "group.Tools": "Tools",
+  "group.View": "View",
+
+  // Shortcut labels (rendered in the help overlay)
+  "shortcut.undo": "Undo",
+  "shortcut.redo": "Redo",
+  "shortcut.copy": "Copy selection",
+  "shortcut.paste": "Paste",
+  "shortcut.delete-selection": "Delete selection",
+  "shortcut.nudge": "Nudge selection",
+  "shortcut.rotate": "Rotate selection",
+  "shortcut.tool-select": "Select tool",
+  "shortcut.tool-place": "Place tool",
+  "shortcut.tool-wall": "Wall tool",
+  "shortcut.tool-delete": "Delete tool",
+  "shortcut.tool-hand": "Hand tool (pan)",
+  "shortcut.help": "Show shortcuts",
+
+  // Mouse gestures (label = trigger, hint = effect)
+  "gesture.marquee.label": "Drag (empty space)",
+  "gesture.marquee.hint": "Marquee-select",
+  "gesture.move.label": "Drag a building",
+  "gesture.move.hint": "Move it (one undo)",
+  "gesture.shift.label": "Shift + click",
+  "gesture.shift.hint": "Add / remove from selection",
+  "gesture.pan.label": "Space + drag",
+  "gesture.pan.hint": "Pan the canvas",
+  "gesture.wheel.label": "Mouse wheel",
+  "gesture.wheel.hint": "Zoom around the cursor",
+
+  // Building categories
+  "category.defense": "Defense",
+  "category.resource": "Resource",
+  "category.storage": "Storage",
+  "category.army": "Army",
+  "category.trap": "Trap",
+  "category.wall": "Wall",
+  "category.townhall": "Town Hall",
 } as const;
 
 /** Every valid message key. */

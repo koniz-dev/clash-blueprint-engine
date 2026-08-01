@@ -9,11 +9,40 @@ export type Locale = "en" | "vi";
 export const LOCALES: readonly Locale[] = ["en", "vi"];
 const CATALOGS: Record<Locale, Messages> = { en, vi };
 
+/** Message keys for the well-known building categories (open set → optional). */
+const CATEGORY_KEYS: Record<string, MessageKey> = {
+  defense: "category.defense",
+  resource: "category.resource",
+  storage: "category.storage",
+  army: "category.army",
+  trap: "category.trap",
+  wall: "category.wall",
+  townhall: "category.townhall",
+};
+
+/** The message key for a category, or `null` for a game-defined one (show raw). */
+export function categoryMessageKey(category: string): MessageKey | null {
+  return CATEGORY_KEYS[category] ?? null;
+}
+
+/** Values interpolated into a message's `{name}` placeholders. */
+export type MessageParams = Record<string, string | number>;
+
+function interpolate(template: string, params?: MessageParams): string {
+  if (!params) return template;
+  return template.replace(/\{(\w+)\}/g, (whole, name: string) =>
+    name in params ? String(params[name]) : whole,
+  );
+}
+
 export interface I18n {
   readonly locale: Locale;
   readonly setLocale: (locale: Locale) => void;
-  /** Translate a key; falls back to the key itself if somehow missing. */
-  readonly t: (key: MessageKey) => string;
+  /**
+   * Translate a key, filling `{name}` placeholders from `params`. Falls back to
+   * the key itself if somehow missing.
+   */
+  readonly t: (key: MessageKey, params?: MessageParams) => string;
 }
 
 const I18nContext = createContext<I18n | null>(null);
@@ -42,7 +71,7 @@ export function I18nProvider({
 
   const value = useMemo<I18n>(() => {
     const catalog = CATALOGS[locale];
-    return { locale, setLocale, t: (key) => catalog[key] ?? key };
+    return { locale, setLocale, t: (key, params) => interpolate(catalog[key] ?? key, params) };
   }, [locale, setLocale]);
 
   return createElement(I18nContext.Provider, { value }, children);
@@ -56,5 +85,5 @@ export function I18nProvider({
 export function useI18n(): I18n {
   const ctx = useContext(I18nContext);
   if (ctx) return ctx;
-  return { locale: "en", setLocale: () => {}, t: (key) => en[key] ?? key };
+  return { locale: "en", setLocale: () => {}, t: (key, params) => interpolate(en[key] ?? key, params) };
 }

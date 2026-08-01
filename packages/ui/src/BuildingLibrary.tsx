@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { BuildingCatalog, BuildingDefinition } from "@clash/engine";
 import { categoryColor, categoryOrder } from "@clash/renderer";
-import { useI18n } from "./i18n";
+import { categoryMessageKey, useI18n } from "./i18n";
 import type { EditorController } from "./useEditor";
 
 export function BuildingLibrary({
@@ -47,15 +47,19 @@ export function BuildingLibrary({
       <input
         className="cbe-lib-search"
         type="search"
-        placeholder="Search buildings…"
-        aria-label="Search buildings"
+        placeholder={t("library.search")}
+        aria-label={t("library.search")}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
-      {categories.length === 0 && <p className="cbe-muted">No buildings match “{query}”.</p>}
-      {categories.map((category) => (
+      {categories.length === 0 && (
+        <p className="cbe-muted">{t("library.noMatch", { query })}</p>
+      )}
+      {categories.map((category) => {
+        const catKey = categoryMessageKey(category);
+        return (
         <div key={category} className="cbe-lib-group">
-          <div className="cbe-lib-category">{category}</div>
+          <div className="cbe-lib-category">{catKey ? t(catKey) : category}</div>
           <div className="cbe-lib-grid">
             {(grouped.get(category) ?? []).map((def) => {
               const active =
@@ -80,7 +84,8 @@ export function BuildingLibrary({
             })}
           </div>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

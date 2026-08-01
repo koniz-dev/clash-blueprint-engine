@@ -11,7 +11,7 @@ import {
 } from "./Panels";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { HistoryPanel } from "./HistoryPanel";
-import { I18nProvider } from "./i18n";
+import { I18nProvider, useI18n } from "./i18n";
 import { ReplayPanel } from "./ReplayPanel";
 import { GESTURES, SHORTCUTS } from "./shortcuts";
 import { ShortcutsOverlay } from "./ShortcutsOverlay";
@@ -33,9 +33,21 @@ export type EditorAppProps = UseEditorOptions;
  * actions; none of them contain game logic.
  */
 export function EditorApp(props: EditorAppProps): JSX.Element {
-  const controller = useEditor(props);
+  // I18nProvider wraps the shell so every component (and the shell's own
+  // translated chrome, e.g. the 3D loading fallback and confirm prompt) reads
+  // the active locale from context.
   return (
     <I18nProvider>
+      <EditorShell {...props} />
+    </I18nProvider>
+  );
+}
+
+function EditorShell(props: EditorAppProps): JSX.Element {
+  const { t } = useI18n();
+  const controller = useEditor(props);
+  return (
+    <>
       <div className="cbe-app">
         <header className="cbe-header">
           <div className="cbe-brand">Clash Blueprint Engine</div>
@@ -49,7 +61,7 @@ export function EditorApp(props: EditorAppProps): JSX.Element {
 
           <main className="cbe-center">
             {controller.viewMode === "3d" ? (
-              <Suspense fallback={<div className="cbe-loading">Loading 3D view…</div>}>
+              <Suspense fallback={<div className="cbe-loading">{t("app.loading3d")}</div>}>
                 <EditorScene3D controller={controller} />
               </Suspense>
             ) : (
@@ -81,11 +93,15 @@ export function EditorApp(props: EditorAppProps): JSX.Element {
 
         <ConfirmDialog
           open={controller.confirmPrompt !== null}
-          message={controller.confirmPrompt?.message ?? ""}
+          message={
+            controller.confirmPrompt
+              ? t(controller.confirmPrompt.messageKey, controller.confirmPrompt.params)
+              : ""
+          }
           onConfirm={controller.actions.confirmDiscard}
           onCancel={controller.actions.cancelConfirm}
         />
       </div>
-    </I18nProvider>
+    </>
   );
 }
