@@ -52,38 +52,58 @@ export function BuildingLibrary({
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
-      {categories.length === 0 && (
-        <p className="cbe-muted">{t("library.noMatch", { query })}</p>
-      )}
+      {categories.length === 0 && <p className="cbe-muted">{t("library.noMatch", { query })}</p>}
       {categories.map((category) => {
         const catKey = categoryMessageKey(category);
         return (
-        <div key={category} className="cbe-lib-group">
-          <div className="cbe-lib-category">{catKey ? t(catKey) : category}</div>
-          <div className="cbe-lib-grid">
-            {(grouped.get(category) ?? []).map((def) => {
-              const active =
-                controller.placingDefinitionId === def.id && controller.tool === "place";
-              return (
-                <button
-                  key={def.id}
-                  className={`cbe-lib-item ${active ? "cbe-lib-item-active" : ""}`}
-                  onClick={() => choose(def.id)}
-                  title={`${def.name} — ${def.width}×${def.height}, TH${def.minTier}`}
-                >
-                  <span
-                    className="cbe-lib-swatch"
-                    style={{ background: categoryColor(def.category) }}
-                  />
-                  <span className="cbe-lib-name">{def.name}</span>
-                  <span className="cbe-lib-size">
-                    {def.width}×{def.height}
-                  </span>
-                </button>
-              );
-            })}
+          <div key={category} className="cbe-lib-group">
+            <div className="cbe-lib-category">{catKey ? t(catKey) : category}</div>
+            <div className="cbe-lib-grid">
+              {(grouped.get(category) ?? []).map((def) => {
+                const active =
+                  controller.placingDefinitionId === def.id && controller.tool === "place";
+                // Live rule status: count vs. allowance + unlock (advisory only).
+                const status = controller.liveValidation.perDefinition.get(def.id);
+                const locked = status ? !status.unlocked : false;
+                const atMax = status?.atMax ?? false;
+                const showCount = status?.allowed === true && status.max !== null;
+                const stateClass = locked ? "cbe-lib-item-locked" : atMax ? "cbe-lib-item-max" : "";
+                const stateHint = locked
+                  ? ` · ${t("library.locked")}`
+                  : atMax
+                    ? ` · ${t("library.atMax")}`
+                    : "";
+                return (
+                  <button
+                    key={def.id}
+                    className={`cbe-lib-item ${active ? "cbe-lib-item-active" : ""} ${stateClass}`}
+                    onClick={() => choose(def.id)}
+                    title={`${def.name} — ${def.width}×${def.height}, TH${def.minTier}${stateHint}`}
+                  >
+                    <span
+                      className="cbe-lib-swatch"
+                      style={{ background: categoryColor(def.category) }}
+                    />
+                    <span className="cbe-lib-name">{def.name}</span>
+                    {locked && (
+                      <span className="cbe-lib-lock" aria-hidden="true" title={t("library.locked")}>
+                        🔒
+                      </span>
+                    )}
+                    {showCount ? (
+                      <span className={`cbe-lib-count ${atMax ? "cbe-lib-count-max" : ""}`}>
+                        {t("library.count", { count: status!.count, max: status!.max! })}
+                      </span>
+                    ) : (
+                      <span className="cbe-lib-size">
+                        {def.width}×{def.height}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
         );
       })}
     </div>

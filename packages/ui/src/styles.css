@@ -550,6 +550,27 @@ body {
   color: var(--muted);
   font-size: 11px;
 }
+/* Live rule status (advisory): dim locked / at-max items, still clickable. */
+.cbe-lib-item-locked,
+.cbe-lib-item-max {
+  opacity: 0.6;
+}
+.cbe-lib-item-max {
+  border-color: var(--danger);
+}
+.cbe-lib-lock {
+  font-size: 10px;
+  flex: none;
+}
+.cbe-lib-count {
+  color: var(--muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+.cbe-lib-count-max {
+  color: var(--danger);
+  font-weight: 600;
+}
 
 /* Chips */
 .cbe-chiprow {

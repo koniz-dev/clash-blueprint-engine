@@ -111,6 +111,9 @@ export const en = {
   // Building library
   "library.search": "Search buildings…",
   "library.noMatch": "No buildings match “{query}”.",
+  "library.count": "{count}/{max}",
+  "library.locked": "Locked",
+  "library.atMax": "Max reached",
 
   // Help overlay
   "help.title": "Keyboard shortcuts",

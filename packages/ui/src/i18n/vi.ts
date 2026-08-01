@@ -101,6 +101,9 @@ export const vi: Messages = {
 
   "library.search": "Tìm công trình…",
   "library.noMatch": "Không có công trình khớp “{query}”.",
+  "library.count": "{count}/{max}",
+  "library.locked": "Chưa mở khóa",
+  "library.atMax": "Đã đạt tối đa",
 
   "help.title": "Phím tắt",
   "help.close": "Đóng",
