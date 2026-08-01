@@ -13,6 +13,13 @@ updates:
         update-types:
           - minor
           - patch
+    ignore:
+      # TypeScript 6 is held: tsup 8.x's .d.ts build is not yet compatible with
+      # it (baseUrl becomes an error; @types/node isn't resolved in the DTS
+      # worker). Revisit when tsup ships TS 6 support.
+      - dependency-name: typescript
+        update-types:
+          - version-update:semver-major
     labels:
       - dependencies
 
