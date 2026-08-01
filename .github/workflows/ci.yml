@@ -9,6 +9,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -33,6 +36,19 @@ jobs:
 
       - name: Test
         run: pnpm test
+
+      - name: Coverage (@clash/ui, gated ≥80%)
+        run: pnpm test:coverage | tee coverage.txt
+
+      - name: Coverage summary
+        if: always()
+        run: |
+          {
+            echo '### @clash/ui coverage'
+            echo '```'
+            sed -n '/Coverage summary/,/====/p' coverage.txt || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Build
         run: pnpm build

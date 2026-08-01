@@ -1,0 +1,30 @@
+version: 2
+updates:
+  # npm dependencies across the pnpm workspace (root manifest covers all packages
+  # because Dependabot follows the lockfile).
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      # One PR for routine minor/patch bumps to keep the noise down.
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
+    labels:
+      - dependencies
+
+  # Keep the GitHub Actions used by our workflows current.
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns:
+          - "*"
+    labels:
+      - ci
+      - dependencies

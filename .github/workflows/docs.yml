@@ -1,0 +1,50 @@
+name: API Docs
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Least privilege: only the deploy job elevates to what Pages/OIDC needs.
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # Never run on forks (Pages deploy would fail; also avoids wasted CI).
+    if: github.repository == 'koniz-dev/clash-blueprint-engine'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+      - name: Install
+        run: pnpm install --frozen-lockfile
+      - name: Build API docs (TypeDoc → docs/api)
+        run: pnpm docs:api
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/api
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.repository == 'koniz-dev/clash-blueprint-engine'
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

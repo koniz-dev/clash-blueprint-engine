@@ -12,6 +12,7 @@
   "scripts": {
     "build": "turbo run build",
     "test": "turbo run test",
+    "test:coverage": "pnpm --filter @clash/ui test:coverage",
     "test:watch": "turbo run test:watch",
     "typecheck": "turbo run typecheck",
     "lint": "eslint .",
