@@ -2,7 +2,9 @@ import type { StorybookConfig } from "@storybook/react-vite";
 
 const config: StorybookConfig = {
   stories: ["../src/**/*.stories.@(ts|tsx)"],
-  addons: ["@storybook/addon-essentials"],
+  // Storybook 10 folded the former addon-essentials (controls, actions, docs,
+  // backgrounds, viewport, …) into core, so no addons entry is needed.
+  addons: [],
   framework: { name: "@storybook/react-vite", options: {} },
   core: { disableTelemetry: true },
   async viteFinal(viteConfig) {
