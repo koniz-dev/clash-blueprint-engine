@@ -1,7 +1,9 @@
 import { categoryColor } from "@clash/renderer";
+import { useI18n } from "./i18n";
 import type { EditorController } from "./useEditor";
 
 export function Inspector({ controller }: { controller: EditorController }): JSX.Element {
+  const { t } = useI18n();
   const building = controller.selectedBuilding;
   const sceneBuilding = building
     ? controller.scene.buildings.find((b) => b.id === building.id)
@@ -9,7 +11,7 @@ export function Inspector({ controller }: { controller: EditorController }): JSX
 
   return (
     <div className="cbe-panel">
-      <h2 className="cbe-panel-title">Inspector</h2>
+      <h2 className="cbe-panel-title">{t("panel.inspector")}</h2>
       {controller.selectedIds.length > 1 ? (
         <div className="cbe-inspector">
           <p>{controller.selectedIds.length} buildings selected.</p>
@@ -61,13 +63,14 @@ export function Inspector({ controller }: { controller: EditorController }): JSX
 }
 
 export function StatsPanel({ controller }: { controller: EditorController }): JSX.Element {
+  const { t } = useI18n();
   const { scene } = controller;
   const byCategory = new Map<string, number>();
   for (const b of scene.buildings)
     byCategory.set(b.category, (byCategory.get(b.category) ?? 0) + 1);
   return (
     <div className="cbe-panel">
-      <h2 className="cbe-panel-title">Statistics</h2>
+      <h2 className="cbe-panel-title">{t("panel.stats")}</h2>
       <div className="cbe-kv">
         <span>Buildings</span>
         <b>{scene.buildings.length}</b>
@@ -92,10 +95,11 @@ export function StatsPanel({ controller }: { controller: EditorController }): JS
 }
 
 export function ValidationPanel({ controller }: { controller: EditorController }): JSX.Element {
+  const { t } = useI18n();
   const report = controller.validation;
   return (
     <div className="cbe-panel">
-      <h2 className="cbe-panel-title">Validation</h2>
+      <h2 className="cbe-panel-title">{t("panel.validation")}</h2>
       {!report ? (
         <p className="cbe-muted">Run “Validate” to check the layout.</p>
       ) : report.issues.length === 0 ? (
@@ -115,10 +119,11 @@ export function ValidationPanel({ controller }: { controller: EditorController }
 }
 
 export function AnalysisPanel({ controller }: { controller: EditorController }): JSX.Element {
+  const { t } = useI18n();
   const score = controller.analysis;
   return (
     <div className="cbe-panel">
-      <h2 className="cbe-panel-title">Defense Score</h2>
+      <h2 className="cbe-panel-title">{t("panel.analysis")}</h2>
       {!score ? (
         <p className="cbe-muted">Run “Analyze” for a defensive breakdown.</p>
       ) : (
@@ -148,10 +153,11 @@ export function AnalysisPanel({ controller }: { controller: EditorController }):
 }
 
 export function AiPanel({ controller }: { controller: EditorController }): JSX.Element {
+  const { t } = useI18n();
   const report = controller.ai;
   return (
     <div className="cbe-panel">
-      <h2 className="cbe-panel-title">AI Suggestions</h2>
+      <h2 className="cbe-panel-title">{t("panel.ai")}</h2>
       {controller.aiLoading ? (
         <p className="cbe-muted">Analyzing (simulating attacks)…</p>
       ) : !report ? (
@@ -188,9 +194,10 @@ export function AiPanel({ controller }: { controller: EditorController }): JSX.E
 }
 
 export function EventLogPanel({ controller }: { controller: EditorController }): JSX.Element {
+  const { t } = useI18n();
   return (
     <div className="cbe-log">
-      <h2 className="cbe-panel-title">Log &amp; Events</h2>
+      <h2 className="cbe-panel-title">{t("panel.log")}</h2>
       <ul className="cbe-log-list">
         {controller.log.map((entry) => (
           <li key={entry.id} className={`cbe-log-item cbe-log-${entry.kind}`}>

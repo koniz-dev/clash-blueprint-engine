@@ -11,6 +11,7 @@ import {
 } from "./Panels";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { HistoryPanel } from "./HistoryPanel";
+import { I18nProvider } from "./i18n";
 import { ReplayPanel } from "./ReplayPanel";
 import { GESTURES, SHORTCUTS } from "./shortcuts";
 import { ShortcutsOverlay } from "./ShortcutsOverlay";
@@ -34,55 +35,57 @@ export type EditorAppProps = UseEditorOptions;
 export function EditorApp(props: EditorAppProps): JSX.Element {
   const controller = useEditor(props);
   return (
-    <div className="cbe-app">
-      <header className="cbe-header">
-        <div className="cbe-brand">Clash Blueprint Engine</div>
-        <Toolbar controller={controller} />
-      </header>
+    <I18nProvider>
+      <div className="cbe-app">
+        <header className="cbe-header">
+          <div className="cbe-brand">Clash Blueprint Engine</div>
+          <Toolbar controller={controller} />
+        </header>
 
-      <div className="cbe-body">
-        <aside className="cbe-left">
-          <BuildingLibrary controller={controller} catalog={props.catalog} />
-        </aside>
+        <div className="cbe-body">
+          <aside className="cbe-left">
+            <BuildingLibrary controller={controller} catalog={props.catalog} />
+          </aside>
 
-        <main className="cbe-center">
-          {controller.viewMode === "3d" ? (
-            <Suspense fallback={<div className="cbe-loading">Loading 3D view…</div>}>
-              <EditorScene3D controller={controller} />
-            </Suspense>
-          ) : (
-            <EditorCanvas controller={controller} catalog={props.catalog} />
-          )}
-        </main>
+          <main className="cbe-center">
+            {controller.viewMode === "3d" ? (
+              <Suspense fallback={<div className="cbe-loading">Loading 3D view…</div>}>
+                <EditorScene3D controller={controller} />
+              </Suspense>
+            ) : (
+              <EditorCanvas controller={controller} catalog={props.catalog} />
+            )}
+          </main>
 
-        <aside className="cbe-right">
-          <Inspector controller={controller} />
-          <HistoryPanel controller={controller} />
-          <ReplayPanel controller={controller} />
-          <StatsPanel controller={controller} />
-          <ValidationPanel controller={controller} />
-          <AnalysisPanel controller={controller} />
-          <AiPanel controller={controller} />
-        </aside>
+          <aside className="cbe-right">
+            <Inspector controller={controller} />
+            <HistoryPanel controller={controller} />
+            <ReplayPanel controller={controller} />
+            <StatsPanel controller={controller} />
+            <ValidationPanel controller={controller} />
+            <AnalysisPanel controller={controller} />
+            <AiPanel controller={controller} />
+          </aside>
+        </div>
+
+        <footer className="cbe-footer">
+          <EventLogPanel controller={controller} />
+        </footer>
+
+        <ShortcutsOverlay
+          open={controller.helpOpen}
+          onClose={controller.actions.closeHelp}
+          shortcuts={SHORTCUTS}
+          gestures={GESTURES}
+        />
+
+        <ConfirmDialog
+          open={controller.confirmPrompt !== null}
+          message={controller.confirmPrompt?.message ?? ""}
+          onConfirm={controller.actions.confirmDiscard}
+          onCancel={controller.actions.cancelConfirm}
+        />
       </div>
-
-      <footer className="cbe-footer">
-        <EventLogPanel controller={controller} />
-      </footer>
-
-      <ShortcutsOverlay
-        open={controller.helpOpen}
-        onClose={controller.actions.closeHelp}
-        shortcuts={SHORTCUTS}
-        gestures={GESTURES}
-      />
-
-      <ConfirmDialog
-        open={controller.confirmPrompt !== null}
-        message={controller.confirmPrompt?.message ?? ""}
-        onConfirm={controller.actions.confirmDiscard}
-        onCancel={controller.actions.cancelConfirm}
-      />
-    </div>
+    </I18nProvider>
   );
 }

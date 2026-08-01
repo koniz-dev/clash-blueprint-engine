@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { BuildingCatalog, BuildingDefinition } from "@clash/engine";
 import { categoryColor, categoryOrder } from "@clash/renderer";
+import { useI18n } from "./i18n";
 import type { EditorController } from "./useEditor";
 
 export function BuildingLibrary({
@@ -10,6 +11,7 @@ export function BuildingLibrary({
   controller: EditorController;
   catalog: BuildingCatalog;
 }): JSX.Element {
+  const { t } = useI18n();
   const [query, setQuery] = useState("");
 
   const grouped = useMemo(() => {
@@ -41,7 +43,7 @@ export function BuildingLibrary({
 
   return (
     <div className="cbe-panel">
-      <h2 className="cbe-panel-title">Buildings</h2>
+      <h2 className="cbe-panel-title">{t("panel.buildings")}</h2>
       <input
         className="cbe-lib-search"
         type="search"

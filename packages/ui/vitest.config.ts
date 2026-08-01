@@ -15,7 +15,12 @@ export default defineConfig({
       provider: "v8",
       // Gate the framework-agnostic *logic* modules. Presentational .tsx
       // components are covered by Storybook + Playwright e2e, not unit coverage.
-      include: ["src/hooks/**/*.ts", "src/shortcuts.ts", "src/canvas-geometry.ts"],
+      include: [
+        "src/hooks/**/*.ts",
+        "src/shortcuts.ts",
+        "src/canvas-geometry.ts",
+        "src/i18n/index.ts",
+      ],
       reporter: ["text-summary", "text"],
       thresholds: { lines: 80, functions: 80 },
     },

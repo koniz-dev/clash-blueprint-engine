@@ -210,6 +210,17 @@ Deployments are placed on the main thread (the sim is milliseconds for a normal
 base). Nothing here reimplements engine logic — the panel and canvas overlay are
 views over engine-produced data, exactly like the `Scene`.
 
+## Internationalization (i18n)
+
+The editor UI ships an **English + Vietnamese** scaffolding (`@clash/ui`'s
+`i18n/`). Strings live in typed catalogs (`messages.ts` is the English source of
+truth; `vi.ts` is typed as `Messages`, so a missing key is a **compile error**).
+A tiny `I18nProvider` + `useI18n()` expose `t(key)` and `locale`/`setLocale`
+(persisted to `localStorage`); the toolbar's `LanguageSwitcher` toggles languages
+live. It's pure UI chrome — no game logic, no dependency — and the toolbar plus
+panel titles are externalized as the worked example; more strings move over by
+adding keys. A unit test enforces catalog-key parity.
+
 ## Why the boundary matters
 
 Everything the user does becomes an engine **command** (undoable, event-sourced),

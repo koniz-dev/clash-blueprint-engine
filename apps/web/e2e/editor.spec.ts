@@ -304,6 +304,17 @@ test.describe("Editor smoke", () => {
     });
   });
 
+  test("switches the editor UI language to Vietnamese", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.getByRole("button", { name: "New", exact: true })).toBeVisible();
+
+    await page.getByRole("button", { name: "VI", exact: true }).click();
+
+    // Toolbar strings are now Vietnamese; the English label is gone.
+    await expect(page.getByRole("button", { name: "Mới", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "New", exact: true })).toHaveCount(0);
+  });
+
   test("switches to the 3D view and mounts a WebGL canvas without crashing", async ({ page }) => {
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(String(e)));

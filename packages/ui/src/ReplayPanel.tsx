@@ -1,3 +1,4 @@
+import { useI18n } from "./i18n";
 import type { EditorController } from "./useEditor";
 
 const SPEEDS = [0.5, 1, 2, 4] as const;
@@ -9,11 +10,12 @@ const SPEEDS = [0.5, 1, 2, 4] as const;
  * in `@clash/simulation` and the timeline animation lives in `useEditor`.
  */
 export function ReplayPanel({ controller }: { controller: EditorController }): JSX.Element {
+  const { t } = useI18n();
   const { replay, actions } = controller;
 
   return (
     <div className="cbe-panel">
-      <h2 className="cbe-panel-title">Attack Replay</h2>
+      <h2 className="cbe-panel-title">{t("panel.replay")}</h2>
 
       {!replay ? (
         <div className="cbe-replay">

@@ -1,3 +1,4 @@
+import { useI18n } from "./i18n";
 import type { EditorController } from "./useEditor";
 
 /**
@@ -7,6 +8,7 @@ import type { EditorController } from "./useEditor";
  * undo/redo commands via the facade — the panel holds no history state itself.
  */
 export function HistoryPanel({ controller }: { controller: EditorController }): JSX.Element {
+  const { t } = useI18n();
   const { undo, redo } = controller.history;
   const isEmpty = undo.length === 0 && redo.length === 0;
 
@@ -29,7 +31,7 @@ export function HistoryPanel({ controller }: { controller: EditorController }): 
 
   return (
     <div className="cbe-panel">
-      <h2 className="cbe-panel-title">History</h2>
+      <h2 className="cbe-panel-title">{t("panel.history")}</h2>
       {isEmpty ? (
         <p className="cbe-muted">No actions yet — place a building to start.</p>
       ) : (
