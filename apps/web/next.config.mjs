@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Next 16's on-screen Dev Tools button ("Open Next.js Dev Tools") otherwise
+  // collides with the editor's own "Open" menu in tests and overlays the canvas.
+  devIndicators: false,
   // Our workspace packages ship TypeScript from `src`; Next transpiles them.
   transpilePackages: [
     "@clash/shared",
