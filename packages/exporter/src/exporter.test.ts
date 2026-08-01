@@ -1,4 +1,4 @@
-import type { LayoutDocument, Renderer } from "@clash/plugins";
+import { CURRENT_SAVE_VERSION, type LayoutDocument, type Renderer } from "@clash/plugins";
 import { describe, expect, it } from "vitest";
 import { jsonExporter } from "./json-exporter.js";
 import { rendererExporter } from "./renderer-exporter.js";
@@ -37,11 +37,14 @@ const document: LayoutDocument = {
 };
 
 describe("jsonExporter", () => {
-  it("serializes the loss-free snapshot", () => {
+  it("serializes the loss-free snapshot behind a version wrapper", () => {
     const result = jsonExporter.export(document, "my-base");
     expect(result.filename).toBe("my-base.json");
     expect(result.mimeType).toBe("application/json");
-    expect(JSON.parse(result.content)).toEqual(document.snapshot);
+    expect(JSON.parse(result.content)).toEqual({
+      formatVersion: CURRENT_SAVE_VERSION,
+      snapshot: document.snapshot,
+    });
   });
 });
 

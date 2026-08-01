@@ -18,3 +18,12 @@ export {
   type ImportError,
 } from "./ports.js";
 export { PluginRegistry } from "./registry.js";
+export {
+  CURRENT_SAVE_VERSION,
+  stampVersion,
+  serializeLayout,
+  migrateToCurrent,
+  parseSaveFile,
+  type PersistedLayout,
+  type SaveFormatError,
+} from "./save-format.js";

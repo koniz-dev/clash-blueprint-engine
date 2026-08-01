@@ -1,9 +1,9 @@
-import type { Exporter } from "@clash/plugins";
+import { serializeLayout, type Exporter } from "@clash/plugins";
 
 /**
  * Loss-free blueprint export. Serializes the document's `snapshot` (not the
- * render scene) so a re-import reconstructs the exact village. Pairs with the
- * JSON importer for a round-trip.
+ * render scene) behind a versioned `formatVersion` wrapper so a re-import can
+ * migrate it forward. Pairs with the JSON importer for a round-trip.
  */
 export const jsonExporter: Exporter = {
   id: "json",
@@ -15,7 +15,7 @@ export const jsonExporter: Exporter = {
     return {
       filename: `${filenameBase}.json`,
       mimeType: "application/json",
-      content: `${JSON.stringify(document.snapshot, null, 2)}\n`,
+      content: serializeLayout(document.snapshot),
     };
   },
 };

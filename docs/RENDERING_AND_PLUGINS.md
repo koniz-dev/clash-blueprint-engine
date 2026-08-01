@@ -104,10 +104,13 @@ Duplicate ids are rejected, so two plugins can't silently shadow each other.
 
 ## Import / export
 
-- **`jsonExporter`** serializes the loss-free `snapshot`. **`jsonImporter`**
-  parses it back (structural validation only; the engine re-validates placement
-  when it rebuilds the `Village`). Together they round-trip a layout exactly —
-  see the pipeline test.
+- **`jsonExporter`** serializes the loss-free `snapshot` behind a versioned
+  `formatVersion` wrapper (via `serializeLayout`). **`jsonImporter`** parses it
+  back through `parseSaveFile` — detecting the version and **migrating old
+  payloads forward** — then does structural validation (the engine re-validates
+  placement when it rebuilds the `Village`). Together they round-trip a layout
+  exactly, across versions — see [SAVE_FORMAT.md](SAVE_FORMAT.md) and the
+  pipeline test.
 - **`rendererExporter(renderer)`** turns _any_ renderer into a file exporter.
   Register a new renderer and you get a new export format for free.
 

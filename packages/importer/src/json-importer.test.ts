@@ -4,6 +4,7 @@ import {
   type BuildingDefinition,
   type VillageSnapshot,
 } from "@clash/engine";
+import { CURRENT_SAVE_VERSION, serializeLayout } from "@clash/plugins";
 import { describe, expect, it } from "vitest";
 import { jsonImporter } from "./json-importer.js";
 
@@ -34,6 +35,26 @@ describe("jsonImporter", () => {
     const result = jsonImporter.import(JSON.stringify(snapshot));
     expect(result.ok).toBe(true);
     if (result.ok) expect(result.value).toEqual(snapshot);
+  });
+
+  it("imports a current-version (wrapped) save file", () => {
+    const result = jsonImporter.import(serializeLayout(snapshot));
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value).toEqual(snapshot);
+  });
+
+  it("migrates a legacy unversioned payload that used `townHall`", () => {
+    const legacy = { grid: { width: 44, height: 44 }, townHall: 9, buildings: [], walls: [] };
+    const result = jsonImporter.import(JSON.stringify(legacy));
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value.tier).toBe(9);
+  });
+
+  it("rejects a save file newer than this app supports", () => {
+    const future = JSON.stringify({ formatVersion: CURRENT_SAVE_VERSION + 1, snapshot });
+    const result = jsonImporter.import(future);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.issues.join("\n")).toMatch(/newer|version/i);
   });
 
   it("rebuilds a valid Village from imported data", () => {

@@ -6,7 +6,7 @@ import {
   type WallSegment,
 } from "@clash/engine";
 import { brand, err, ok, type Result } from "@clash/shared";
-import type { ImportError, Importer } from "@clash/plugins";
+import { parseSaveFile, type ImportError, type Importer } from "@clash/plugins";
 
 type Json = Record<string, unknown>;
 
@@ -29,22 +29,17 @@ function readVec(value: unknown): { x: number; y: number } | undefined {
  * just one layer down.
  */
 function parseSnapshot(text: string, source: string): Result<VillageSnapshot, ImportError> {
-  let raw: unknown;
-  try {
-    raw = JSON.parse(text);
-  } catch (error) {
-    return err({ source, issues: [error instanceof Error ? error.message : String(error)] });
-  }
+  // Parse + migrate at the save-format boundary first: JSON errors, unknown /
+  // too-new versions, and the legacy `townHall → tier` rename are all handled
+  // there, so this function only does structural validation of the current shape.
+  const parsed = parseSaveFile(text);
+  if (!parsed.ok) return err({ source, issues: [...parsed.error.issues] });
+  const raw = parsed.value;
 
   const issues: string[] = [];
-  if (!isObject(raw)) return err({ source, issues: ["root must be an object"] });
-
   const grid = readVec2Size(raw.grid);
   if (!grid) issues.push("grid must be { width, height }");
-  // Accept legacy `townHall` as an alias for `tier` so blueprints saved before
-  // the game-agnostic migration still load.
-  const tierValue = raw.tier ?? raw.townHall;
-  const tier = typeof tierValue === "number" ? tierValue : undefined;
+  const tier = typeof raw.tier === "number" ? raw.tier : undefined;
   if (tier === undefined) issues.push("tier must be a number");
 
   const buildings: BuildingInstance[] = [];
