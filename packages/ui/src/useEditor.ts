@@ -28,6 +28,7 @@ import { useEngineBinding } from "./hooks/useEngineBinding";
 import { useSelection } from "./hooks/useSelection";
 import { useClipboard } from "./hooks/useClipboard";
 import { useQueries, type AnalyzeAsync } from "./hooks/useQueries";
+import { useLiveValidation } from "./hooks/useLiveValidation";
 import { useReplay } from "./hooks/useReplay";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { usePersistence } from "./hooks/usePersistence";
@@ -111,6 +112,8 @@ export function useEditor(options: UseEditorOptions) {
   const { selectedIds, selectedId, setSelectedIds, partitionSelection } = selection;
   const clipboard = useClipboard(editor, selectedIds, setSelectedIds, pushLog);
   const queries = useQueries(editor, catalog, rules, ruleSet, analyzeAsync, pushLog);
+  // Reactive rule feedback derived from the pure validator on every change.
+  const liveValidation = useLiveValidation(editor, catalog, rules, ruleSet, version);
   const replay = useReplay(editor, catalog, rules, pushLog);
   const help = useHelp(options.persistKey);
   const guard = useDiscardGuard(editor);
@@ -243,11 +246,7 @@ export function useEditor(options: UseEditorOptions) {
     afterLoad();
     pushLog("info", "New layout");
   }, [editor, afterLoad, pushLog]);
-  const reset = useCallback(
-    () =>
-      guard.guardDiscard("discard.new", resetNow),
-    [guard, resetNow],
-  );
+  const reset = useCallback(() => guard.guardDiscard("discard.new", resetNow), [guard, resetNow]);
 
   /** Replace the whole layout with a loaded snapshot (import / template / restore). */
   const importSnapshot = useCallback(
@@ -357,6 +356,8 @@ export function useEditor(options: UseEditorOptions) {
     setRotation,
     log,
     validation: queries.validation,
+    // Reactive rule feedback (report + per-building severity + per-definition status).
+    liveValidation,
     analysis: queries.analysis,
     ai: queries.ai,
     aiLoading: queries.aiLoading,
