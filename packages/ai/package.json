@@ -20,7 +20,7 @@
     "@clash/simulation": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "^5.6.0",
+    "typescript": "^6.0.3",
     "vitest": "^2.1.0"
   },
   "publishConfig": {
