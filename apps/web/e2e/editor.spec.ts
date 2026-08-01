@@ -285,6 +285,25 @@ test.describe("Editor smoke", () => {
     expect(download.suggestedFilename()).toBe("layout.gltf");
   });
 
+  test.describe("Touch input", () => {
+    test.use({ hasTouch: true });
+
+    test("places a building via a touch tap", async ({ page }) => {
+      await page.goto("/");
+      await page
+        .getByRole("button", { name: /Cannon/ })
+        .first()
+        .click();
+      const surface = page.locator(".cbe-canvas");
+      const box = await surface.boundingBox();
+      if (!box) throw new Error("canvas has no bounding box");
+
+      // A single-finger tap dispatches pointer events Konva turns into a place.
+      await page.touchscreen.tap(box.x + 220, box.y + 220);
+      await expect(page.getByText("BuildingPlaced").first()).toBeVisible();
+    });
+  });
+
   test("switches to the 3D view and mounts a WebGL canvas without crashing", async ({ page }) => {
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(String(e)));

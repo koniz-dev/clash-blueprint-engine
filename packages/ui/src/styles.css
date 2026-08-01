@@ -402,6 +402,9 @@ body {
 .cbe-canvas {
   position: absolute;
   inset: 0;
+  /* Let Konva handle touch gestures (drag/select/pan/pinch) instead of the
+     browser scrolling or page-zooming. */
+  touch-action: none;
 }
 .cbe-scene3d {
   position: absolute;

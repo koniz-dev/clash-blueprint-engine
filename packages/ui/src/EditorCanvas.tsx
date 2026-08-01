@@ -93,6 +93,10 @@ export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.El
   } | null>(null);
   const drag = useRef<{ startTile: GridVec; ids: string[] } | null>(null);
   const [dragDelta, setDragDelta] = useState<GridVec | null>(null);
+  // Active pointers (mouse/touch/pen) for two-finger pinch-zoom on touch.
+  const pointers = useRef(new Map<number, { x: number; y: number }>());
+  const pinch = useRef<{ dist: number; scale: number } | null>(null);
+  const gestureWasPinch = useRef(false);
 
   // Hold Space to pan in the Select tool (otherwise a drag draws a marquee).
   useEffect(() => {
@@ -137,26 +141,32 @@ export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.El
     [controller.replay, controller.replayTime],
   );
 
+  /** Zoom to `targetScale` (clamped) keeping the screen point `at` fixed. */
+  const zoomAround = (targetScale: number, at: { x: number; y: number }): void => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    const oldScale = stage.scaleX();
+    const newScale = Math.min(3, Math.max(0.25, targetScale));
+    const worldX = (at.x - stage.x()) / oldScale;
+    const worldY = (at.y - stage.y()) / oldScale;
+    stage.scale({ x: newScale, y: newScale });
+    stage.position({ x: at.x - worldX * newScale, y: at.y - worldY * newScale });
+    setScale(newScale);
+  };
+
   const handleWheel = (e: KonvaEventObject<WheelEvent>): void => {
     e.evt.preventDefault();
     const stage = stageRef.current;
     if (!stage) return;
-    const oldScale = stage.scaleX();
     const pointer = stage.getPointerPosition();
     if (!pointer) return;
-    const mousePoint = {
-      x: (pointer.x - stage.x()) / oldScale,
-      y: (pointer.y - stage.y()) / oldScale,
-    };
-    const direction = e.evt.deltaY > 0 ? -1 : 1;
-    const newScale = Math.min(3, Math.max(0.25, oldScale * (direction > 0 ? 1.1 : 1 / 1.1)));
-    stage.scale({ x: newScale, y: newScale });
-    stage.position({
-      x: pointer.x - mousePoint.x * newScale,
-      y: pointer.y - mousePoint.y * newScale,
-    });
-    setScale(newScale);
+    const factor = e.evt.deltaY > 0 ? 1 / 1.1 : 1.1;
+    zoomAround(stage.scaleX() * factor, pointer);
   };
+
+  const activePointers = (): { x: number; y: number }[] => [...pointers.current.values()];
+  const pointerDist = (a: { x: number; y: number }, b: { x: number; y: number }): number =>
+    Math.hypot(a.x - b.x, a.y - b.y);
 
   const actAt = (tile: GridVec): void => {
     if (tile.x < 0 || tile.y < 0 || tile.x >= scene.grid.width || tile.y >= scene.grid.height)
@@ -182,9 +192,23 @@ export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.El
     }
   };
 
-  const handleMouseDown = (e: KonvaEventObject<MouseEvent>): void => {
+  const handlePointerDown = (e: KonvaEventObject<PointerEvent>): void => {
     const stage = stageRef.current;
     if (!stage) return;
+    pointers.current.set(e.evt.pointerId, { x: e.evt.offsetX, y: e.evt.offsetY });
+    // Second finger down → pinch-zoom; cancel any in-progress single-pointer gesture.
+    if (pointers.current.size >= 2) {
+      const [a, b] = activePointers();
+      if (a && b) pinch.current = { dist: pointerDist(a, b), scale: stage.scaleX() };
+      gestureWasPinch.current = true;
+      pendingDrag.current = null;
+      drag.current = null;
+      setDragDelta(null);
+      marqueeStart.current = null;
+      setMarquee(null);
+      painting.current = false;
+      return;
+    }
     additive.current = e.evt.shiftKey;
     downPos.current = stage.getPointerPosition();
     moved.current = false;
@@ -212,9 +236,21 @@ export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.El
     }
   };
 
-  const handleMouseMove = (): void => {
+  const handlePointerMove = (e: KonvaEventObject<PointerEvent>): void => {
     const stage = stageRef.current;
     if (!stage) return;
+    if (pointers.current.has(e.evt.pointerId)) {
+      pointers.current.set(e.evt.pointerId, { x: e.evt.offsetX, y: e.evt.offsetY });
+    }
+    // Two-finger pinch: scale around the midpoint, skip single-pointer handling.
+    if (pinch.current && pointers.current.size >= 2) {
+      const [a, b] = activePointers();
+      if (a && b && pinch.current.dist > 0) {
+        const ratio = pointerDist(a, b) / pinch.current.dist;
+        zoomAround(pinch.current.scale * ratio, { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
+      }
+      return;
+    }
     const tile = pointerTile(stage);
     setHover(tile);
     const start = downPos.current;
@@ -247,8 +283,17 @@ export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.El
     if (marqueeStart.current && tile) setMarquee(tileRectBetween(marqueeStart.current, tile));
   };
 
-  const handleMouseUp = (): void => {
+  const handlePointerUp = (e: KonvaEventObject<PointerEvent>): void => {
     const stage = stageRef.current;
+    pointers.current.delete(e.evt.pointerId);
+    if (pointers.current.size < 2) pinch.current = null;
+    // Still fingers down (mid-pinch) — don't commit a single-pointer gesture.
+    if (pointers.current.size >= 1) return;
+    // A pinch just ended: swallow the release so it doesn't fire a phantom click.
+    if (gestureWasPinch.current) {
+      gestureWasPinch.current = false;
+      return;
+    }
     painting.current = false;
     if (!stage) return;
     if (tool === "wall") return; // handled on down/move
@@ -291,14 +336,17 @@ export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.El
         height={size.height}
         draggable={tool === "wall" ? false : tool === "select" ? spaceHeld : true}
         onWheel={handleWheel}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={() => {
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerLeave={() => {
           painting.current = false;
           marqueeStart.current = null;
           pendingDrag.current = null;
           drag.current = null;
+          pointers.current.clear();
+          pinch.current = null;
+          gestureWasPinch.current = false;
           setDragDelta(null);
           setMarquee(null);
           setHover(null);

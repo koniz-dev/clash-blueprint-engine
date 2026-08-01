@@ -59,7 +59,10 @@ a Vue or Svelte hook, a CLI, or tests with no change to the core.
 ## Features
 
 - **Canvas** (Konva): pan (drag), zoom (wheel, around the cursor), grid, live
-  placement preview, selection highlight.
+  placement preview, selection highlight. Input is **pointer-based** (mouse, pen
+  and **touch**): the same tap/drag/marquee/pan work on touchscreens, with
+  **two-finger pinch-to-zoom**; `touch-action: none` hands gestures to the canvas
+  instead of the browser.
 - **Tools**: Select (inspect), Place (from the library, with rotation), Wall
   (click-drag paint, **auto-connecting** into runs and corners), Delete.
 - **Direct manipulation**: in the Select tool, **drag a building** to move it —
