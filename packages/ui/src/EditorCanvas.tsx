@@ -12,6 +12,9 @@ import type { EditorController } from "./useEditor";
 
 const TILE = 24;
 const DRAG_THRESHOLD = 4; // px; distinguishes a click from a pan
+// Live rule-feedback outline colors (error red / warning amber).
+const RULE_ERROR = "#e5484d";
+const RULE_WARNING = "#f5a524";
 
 /** Distinct colours for the built-in troop roster (view-only). */
 const TROOP_COLORS: Record<string, string> = {
@@ -390,6 +393,15 @@ export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.El
           {scene.buildings.map((b) => {
             const selected = controller.selectedIds.includes(b.id);
             const destroyed = replayState?.destroyedBuildingIds.has(b.id) ?? false;
+            // Live rule feedback: outline rule-violating buildings (error/warning).
+            const severity = controller.liveValidation.severityById.get(b.id);
+            const stroke = selected
+              ? "#ffd600"
+              : severity === "error"
+                ? RULE_ERROR
+                : severity === "warning"
+                  ? RULE_WARNING
+                  : "#263238";
             return (
               <Group key={b.id} opacity={destroyed ? 0.25 : 1}>
                 <Rect
@@ -400,8 +412,8 @@ export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.El
                   cornerRadius={3}
                   fill={destroyed ? "#5a5a5a" : categoryColor(b.category)}
                   opacity={0.9}
-                  stroke={selected ? "#ffd600" : "#263238"}
-                  strokeWidth={selected ? 3 : 1}
+                  stroke={stroke}
+                  strokeWidth={selected || severity ? 3 : 1}
                 />
                 <Text
                   x={b.bounds.x * TILE}
@@ -654,6 +666,9 @@ function PlacementPreview({
     const def = catalog.get(placingDefinitionId);
     if (!def) return null;
     const { bounds } = computeFootprint(def, tile, rotation);
+    // Would placing this now break a count/unlock rule? Tint the preview red.
+    const status = controller.liveValidation.perDefinition.get(placingDefinitionId);
+    const wouldViolate = status ? !status.unlocked || !status.allowed || status.atMax : false;
     return (
       <Rect
         x={bounds.x * TILE}
@@ -661,8 +676,11 @@ function PlacementPreview({
         width={bounds.width * TILE}
         height={bounds.height * TILE}
         cornerRadius={3}
-        fill={categoryColor(def.category)}
-        opacity={0.4}
+        fill={wouldViolate ? RULE_ERROR : categoryColor(def.category)}
+        opacity={wouldViolate ? 0.5 : 0.4}
+        stroke={wouldViolate ? RULE_ERROR : undefined}
+        strokeWidth={wouldViolate ? 2 : 0}
+        dash={wouldViolate ? [4, 4] : undefined}
         listening={false}
       />
     );
