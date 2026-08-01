@@ -1,0 +1,15 @@
+node_modules/
+dist/
+coverage/
+.turbo/
+test-results/
+playwright-report/
+*.tsbuildinfo
+.DS_Store
+.next/
+out/
+*.log
+
+# generated API docs
+docs/api/
+storybook-static/

@@ -1,0 +1,36 @@
+{
+  "name": "@clash/web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Next.js editor app — a thin client shell over @clash/ui and the engine.",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@clash/ai": "workspace:*",
+    "@clash/analyzer": "workspace:*",
+    "@clash/engine": "workspace:*",
+    "@clash/exporter": "workspace:*",
+    "@clash/importer": "workspace:*",
+    "@clash/plugins": "workspace:*",
+    "@clash/renderer": "workspace:*",
+    "@clash/rules-engine": "workspace:*",
+    "@clash/simulation": "workspace:*",
+    "@clash/ui": "workspace:*",
+    "next": "14.2.15",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "typescript": "^5.6.0"
+  }
+}

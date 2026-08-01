@@ -1,0 +1,51 @@
+[
+  { "id": "keep", "name": "Great Keep", "category": "keep", "width": 4, "height": 4, "minTier": 1 },
+  {
+    "id": "turret",
+    "name": "Arrow Turret",
+    "category": "turret",
+    "width": 2,
+    "height": 2,
+    "minTier": 1,
+    "attackRange": 6,
+    "damageType": "single",
+    "targets": ["ground", "air"]
+  },
+  {
+    "id": "ballista",
+    "name": "Ballista",
+    "category": "turret",
+    "width": 3,
+    "height": 3,
+    "minTier": 3,
+    "attackRange": 9,
+    "damageType": "splash",
+    "targets": ["ground"]
+  },
+  {
+    "id": "gold_vault",
+    "name": "Gold Vault",
+    "category": "vault",
+    "width": 3,
+    "height": 3,
+    "minTier": 1
+  },
+  {
+    "id": "barracks",
+    "name": "Barracks",
+    "category": "barracks",
+    "width": 3,
+    "height": 3,
+    "minTier": 2
+  },
+  {
+    "id": "spike_snare",
+    "name": "Spike Snare",
+    "category": "snare",
+    "width": 1,
+    "height": 1,
+    "minTier": 2,
+    "damageType": "splash",
+    "targets": ["ground"]
+  }
+]

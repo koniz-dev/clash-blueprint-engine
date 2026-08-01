@@ -1,0 +1,195 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`build3DModel > is deterministic (snapshot) 1`] = `
+{
+  "buildings": [
+    {
+      "category": "townhall",
+      "center": {
+        "x": 8,
+        "y": 2,
+        "z": 8,
+      },
+      "color": "#2e7d32",
+      "id": "ent_1",
+      "isCore": true,
+      "rotationDeg": 0,
+      "size": {
+        "depth": 4,
+        "height": 4,
+        "width": 4,
+      },
+    },
+    {
+      "category": "defense",
+      "center": {
+        "x": 1.5,
+        "y": 1.5,
+        "z": 1.5,
+      },
+      "color": "#c62828",
+      "id": "ent_2",
+      "isCore": false,
+      "rotationDeg": 0,
+      "size": {
+        "depth": 3,
+        "height": 3,
+        "width": 3,
+      },
+    },
+    {
+      "category": "mystic",
+      "center": {
+        "x": 13,
+        "y": 1,
+        "z": 1,
+      },
+      "color": "#9e9d24",
+      "id": "ent_3",
+      "isCore": false,
+      "rotationDeg": 0,
+      "size": {
+        "depth": 2,
+        "height": 2,
+        "width": 2,
+      },
+    },
+  ],
+  "ground": {
+    "height": 16,
+    "width": 16,
+  },
+  "walls": [
+    {
+      "center": {
+        "x": 2.5,
+        "y": 0.55,
+        "z": 3.5,
+      },
+      "color": "#546e7a",
+      "size": {
+        "depth": 0.55,
+        "height": 1.1,
+        "width": 0.55,
+      },
+    },
+    {
+      "center": {
+        "x": 2.5,
+        "y": 0.55,
+        "z": 3.75,
+      },
+      "color": "#546e7a",
+      "size": {
+        "depth": 0.5,
+        "height": 1.1,
+        "width": 0.4,
+      },
+    },
+    {
+      "center": {
+        "x": 2.5,
+        "y": 0.55,
+        "z": 4.5,
+      },
+      "color": "#546e7a",
+      "size": {
+        "depth": 0.55,
+        "height": 1.1,
+        "width": 0.55,
+      },
+    },
+    {
+      "center": {
+        "x": 2.5,
+        "y": 0.55,
+        "z": 4.25,
+      },
+      "color": "#546e7a",
+      "size": {
+        "depth": 0.5,
+        "height": 1.1,
+        "width": 0.4,
+      },
+    },
+    {
+      "center": {
+        "x": 2.75,
+        "y": 0.55,
+        "z": 4.5,
+      },
+      "color": "#546e7a",
+      "size": {
+        "depth": 0.4,
+        "height": 1.1,
+        "width": 0.5,
+      },
+    },
+    {
+      "center": {
+        "x": 3.5,
+        "y": 0.55,
+        "z": 4.5,
+      },
+      "color": "#546e7a",
+      "size": {
+        "depth": 0.55,
+        "height": 1.1,
+        "width": 0.55,
+      },
+    },
+    {
+      "center": {
+        "x": 3.25,
+        "y": 0.55,
+        "z": 4.5,
+      },
+      "color": "#546e7a",
+      "size": {
+        "depth": 0.4,
+        "height": 1.1,
+        "width": 0.5,
+      },
+    },
+    {
+      "center": {
+        "x": 3.75,
+        "y": 0.55,
+        "z": 4.5,
+      },
+      "color": "#546e7a",
+      "size": {
+        "depth": 0.4,
+        "height": 1.1,
+        "width": 0.5,
+      },
+    },
+    {
+      "center": {
+        "x": 4.5,
+        "y": 0.55,
+        "z": 4.5,
+      },
+      "color": "#546e7a",
+      "size": {
+        "depth": 0.55,
+        "height": 1.1,
+        "width": 0.55,
+      },
+    },
+    {
+      "center": {
+        "x": 4.25,
+        "y": 0.55,
+        "z": 4.5,
+      },
+      "color": "#546e7a",
+      "size": {
+        "depth": 0.4,
+        "height": 1.1,
+        "width": 0.5,
+      },
+    },
+  ],
+}
+`;

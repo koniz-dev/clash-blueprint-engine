@@ -1,0 +1,39 @@
+{
+  "name": "@clash/rules-engine",
+  "version": "0.1.0",
+  "description": "Data-driven game rules and a composable layout validation engine.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./node": "./src/node/index.ts"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./node": {
+        "types": "./dist/node/index.d.ts",
+        "import": "./dist/node/index.js"
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts src/node/index.ts --format esm --dts --clean --sourcemap",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@clash/engine": "workspace:*",
+    "@clash/shared": "workspace:*",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

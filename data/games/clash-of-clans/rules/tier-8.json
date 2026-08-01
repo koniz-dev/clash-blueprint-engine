@@ -1,0 +1,32 @@
+{
+  "tier": 8,
+  "gridSize": 44,
+  "walls": 225,
+  "required": [{ "id": "town_hall", "min": 1, "max": 1 }],
+  "buildings": [
+    { "id": "town_hall", "maxCount": 1 },
+    { "id": "clan_castle", "maxCount": 1 },
+    { "id": "cannon", "maxCount": 5 },
+    { "id": "archer_tower", "maxCount": 6 },
+    { "id": "mortar", "maxCount": 3 },
+    { "id": "air_defense", "maxCount": 3 },
+    { "id": "wizard_tower", "maxCount": 4 },
+    { "id": "hidden_tesla", "maxCount": 3 },
+    { "id": "gold_mine", "maxCount": 6 },
+    { "id": "elixir_collector", "maxCount": 6 },
+    { "id": "dark_elixir_drill", "maxCount": 2 },
+    { "id": "gold_storage", "maxCount": 3 },
+    { "id": "elixir_storage", "maxCount": 3 },
+    { "id": "dark_elixir_storage", "maxCount": 1 },
+    { "id": "army_camp", "maxCount": 4 },
+    { "id": "barracks", "maxCount": 4 },
+    { "id": "dark_barracks", "maxCount": 1 },
+    { "id": "laboratory", "maxCount": 1 },
+    { "id": "spell_factory", "maxCount": 1 },
+    { "id": "bomb", "maxCount": 6 },
+    { "id": "spring_trap", "maxCount": 4 },
+    { "id": "air_bomb", "maxCount": 4 },
+    { "id": "giant_bomb", "maxCount": 2 },
+    { "id": "seeking_air_mine", "maxCount": 2 }
+  ]
+}

@@ -1,0 +1,529 @@
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Stage, Layer, Rect, Line, Text, Group, Circle } from "react-konva";
+import type Konva from "konva";
+import type { KonvaEventObject } from "konva/lib/Node";
+import { computeFootprint, type BuildingCatalog } from "@clash/engine";
+import { WALL_COLOR, categoryColor, categorySymbol } from "@clash/renderer";
+import { replayStateAt } from "@clash/simulation";
+import type { SceneWall } from "@clash/plugins";
+import type { GridVec, Rect as TileRect } from "@clash/shared";
+import type { EditorController } from "./useEditor";
+
+const TILE = 24;
+const DRAG_THRESHOLD = 4; // px; distinguishes a click from a pan
+
+/** Distinct colours for the built-in troop roster (view-only). */
+const TROOP_COLORS: Record<string, string> = {
+  barbarian: "#f4b350",
+  archer: "#7ed957",
+  giant: "#c98a5e",
+  wizard: "#b06bff",
+  dragon: "#e5484d",
+  pekka: "#5b6bff",
+  hog_rider: "#8a5a2b",
+};
+function troopColor(troopId: string): string {
+  return TROOP_COLORS[troopId] ?? "#ffffff";
+}
+
+function useElementSize<T extends HTMLElement>() {
+  const ref = useRef<T | null>(null);
+  const [size, setSize] = useState({ width: 800, height: 600 });
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new ResizeObserver((entries) => {
+      const rect = entries[0]?.contentRect;
+      if (rect) setSize({ width: Math.max(1, rect.width), height: Math.max(1, rect.height) });
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+  return { ref, size };
+}
+
+/** Inclusive tile rectangle spanned by two corner tiles. */
+function tileRectBetween(a: GridVec, b: GridVec): TileRect {
+  return {
+    x: Math.min(a.x, b.x),
+    y: Math.min(a.y, b.y),
+    width: Math.abs(a.x - b.x) + 1,
+    height: Math.abs(a.y - b.y) + 1,
+  };
+}
+
+function pointerTile(stage: Konva.Stage): GridVec | null {
+  const pos = stage.getPointerPosition();
+  if (!pos) return null;
+  const transform = stage.getAbsoluteTransform().copy().invert();
+  const world = transform.point(pos);
+  return { x: Math.floor(world.x / TILE), y: Math.floor(world.y / TILE) };
+}
+
+/** Id of the building whose footprint covers `tile`, or null. */
+function buildingIdAt(scene: EditorController["scene"], tile: GridVec): string | null {
+  for (const b of scene.buildings) {
+    if (
+      tile.x >= b.bounds.x &&
+      tile.x < b.bounds.x + b.bounds.width &&
+      tile.y >= b.bounds.y &&
+      tile.y < b.bounds.y + b.bounds.height
+    ) {
+      return b.id;
+    }
+  }
+  return null;
+}
+
+export interface EditorCanvasProps {
+  readonly controller: EditorController;
+  readonly catalog: BuildingCatalog;
+}
+
+/**
+ * Konva-based editing surface. It is a pure *view* over `controller.scene`:
+ * it draws the scene and translates pointer input into controller actions
+ * (place / select / paint walls / delete). It never mutates domain state
+ * directly — all changes flow through the editor facade in {@link useEditor}.
+ */
+export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.Element {
+  const { ref, size } = useElementSize<HTMLDivElement>();
+  const stageRef = useRef<Konva.Stage | null>(null);
+  const [scale, setScale] = useState(1);
+  const [hover, setHover] = useState<GridVec | null>(null);
+  const [spaceHeld, setSpaceHeld] = useState(false);
+  const [marquee, setMarquee] = useState<TileRect | null>(null);
+  const marqueeStart = useRef<GridVec | null>(null);
+  const painting = useRef(false);
+  const additive = useRef(false);
+  const downPos = useRef<{ x: number; y: number } | null>(null);
+  const moved = useRef(false);
+  // Drag-to-move: a candidate is armed on mouse-down over a building, and
+  // promoted to an active drag once the pointer actually moves.
+  const pendingDrag = useRef<{
+    startTile: GridVec;
+    buildingId: string;
+    wasSelected: boolean;
+  } | null>(null);
+  const drag = useRef<{ startTile: GridVec; ids: string[] } | null>(null);
+  const [dragDelta, setDragDelta] = useState<GridVec | null>(null);
+
+  // Hold Space to pan in the Select tool (otherwise a drag draws a marquee).
+  useEffect(() => {
+    const onDown = (e: KeyboardEvent): void => {
+      if (e.code === "Space") setSpaceHeld(true);
+    };
+    const onUp = (e: KeyboardEvent): void => {
+      if (e.code === "Space") setSpaceHeld(false);
+    };
+    window.addEventListener("keydown", onDown);
+    window.addEventListener("keyup", onUp);
+    return () => {
+      window.removeEventListener("keydown", onDown);
+      window.removeEventListener("keyup", onUp);
+    };
+  }, []);
+
+  const { scene, tool } = controller;
+  const gridW = scene.grid.width * TILE;
+  const gridH = scene.grid.height * TILE;
+
+  // Replay projection: interpolated unit poses + cumulative destruction at the
+  // current playback time. Pure view over the engine-produced timeline.
+  const replayState = useMemo(
+    () =>
+      controller.replay ? replayStateAt(controller.replay.timeline, controller.replayTime) : null,
+    [controller.replay, controller.replayTime],
+  );
+
+  const handleWheel = (e: KonvaEventObject<WheelEvent>): void => {
+    e.evt.preventDefault();
+    const stage = stageRef.current;
+    if (!stage) return;
+    const oldScale = stage.scaleX();
+    const pointer = stage.getPointerPosition();
+    if (!pointer) return;
+    const mousePoint = {
+      x: (pointer.x - stage.x()) / oldScale,
+      y: (pointer.y - stage.y()) / oldScale,
+    };
+    const direction = e.evt.deltaY > 0 ? -1 : 1;
+    const newScale = Math.min(3, Math.max(0.25, oldScale * (direction > 0 ? 1.1 : 1 / 1.1)));
+    stage.scale({ x: newScale, y: newScale });
+    stage.position({
+      x: pointer.x - mousePoint.x * newScale,
+      y: pointer.y - mousePoint.y * newScale,
+    });
+    setScale(newScale);
+  };
+
+  const actAt = (tile: GridVec): void => {
+    if (tile.x < 0 || tile.y < 0 || tile.x >= scene.grid.width || tile.y >= scene.grid.height)
+      return;
+    // Deploy mode intercepts clicks to drop attackers, regardless of tool.
+    if (controller.deployMode) {
+      controller.actions.addDeployAt(tile);
+      return;
+    }
+    switch (tool) {
+      case "place":
+        controller.actions.placeBuilding(tile);
+        break;
+      case "wall":
+        controller.actions.addWall(tile);
+        break;
+      case "delete":
+        controller.actions.deleteAt(tile);
+        break;
+      case "select":
+        controller.actions.selectAt(tile, additive.current);
+        break;
+    }
+  };
+
+  const handleMouseDown = (e: KonvaEventObject<MouseEvent>): void => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    additive.current = e.evt.shiftKey;
+    downPos.current = stage.getPointerPosition();
+    moved.current = false;
+    // In deploy mode a plain click drops a troop (handled on mouse-up); don't
+    // start a marquee or a building drag.
+    if (controller.deployMode) return;
+    if (tool === "wall") {
+      painting.current = true;
+      const tile = pointerTile(stage);
+      if (tile) actAt(tile);
+    } else if (tool === "select" && !spaceHeld) {
+      const tile = pointerTile(stage);
+      const buildingId = tile ? buildingIdAt(scene, tile) : null;
+      // Plain press on a building arms a drag; shift-press or empty space
+      // falls back to marquee / toggle selection.
+      if (tile && buildingId && !e.evt.shiftKey) {
+        pendingDrag.current = {
+          startTile: tile,
+          buildingId,
+          wasSelected: controller.selectedIds.includes(buildingId),
+        };
+      } else {
+        marqueeStart.current = tile;
+      }
+    }
+  };
+
+  const handleMouseMove = (): void => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    const tile = pointerTile(stage);
+    setHover(tile);
+    const start = downPos.current;
+    const now = stage.getPointerPosition();
+    if (start && now && Math.hypot(now.x - start.x, now.y - start.y) > DRAG_THRESHOLD) {
+      moved.current = true;
+    }
+    if (painting.current && tool === "wall" && tile) actAt(tile);
+
+    // Promote an armed candidate into an active drag on first real movement.
+    if (pendingDrag.current && !drag.current && moved.current) {
+      const p = pendingDrag.current;
+      const buildingIds = new Set(scene.buildings.map((b) => b.id));
+      let ids: string[];
+      if (p.wasSelected) {
+        ids = controller.selectedIds.filter((id) => buildingIds.has(id));
+      } else {
+        controller.actions.selectBuilding(p.buildingId, false);
+        ids = [p.buildingId];
+      }
+      drag.current = { startTile: p.startTile, ids };
+    }
+    if (drag.current && tile) {
+      setDragDelta({ x: tile.x - drag.current.startTile.x, y: tile.y - drag.current.startTile.y });
+    }
+    if (marqueeStart.current && tile) setMarquee(tileRectBetween(marqueeStart.current, tile));
+  };
+
+  const handleMouseUp = (): void => {
+    const stage = stageRef.current;
+    painting.current = false;
+    if (!stage) return;
+    if (tool === "wall") return; // handled on down/move
+
+    // Commit an active drag as a single move gesture.
+    if (drag.current) {
+      const delta = dragDelta;
+      drag.current = null;
+      pendingDrag.current = null;
+      setDragDelta(null);
+      if (moved.current && delta && (delta.x !== 0 || delta.y !== 0)) {
+        controller.actions.moveSelectedBy(delta.x, delta.y);
+      }
+      return;
+    }
+    // An armed-but-not-dragged candidate is just a click → fall through to select.
+    pendingDrag.current = null;
+
+    if (tool === "select" && marqueeStart.current) {
+      const start = marqueeStart.current;
+      marqueeStart.current = null;
+      setMarquee(null);
+      const end = pointerTile(stage);
+      if (moved.current && end) {
+        controller.actions.selectInRect(tileRectBetween(start, end), additive.current);
+        return;
+      }
+    }
+
+    if (moved.current) return; // it was a pan, not a click
+    const tile = pointerTile(stage);
+    if (tile) actAt(tile);
+  };
+
+  return (
+    <div ref={ref} className="cbe-canvas">
+      <Stage
+        ref={stageRef}
+        width={size.width}
+        height={size.height}
+        draggable={tool === "wall" ? false : tool === "select" ? spaceHeld : true}
+        onWheel={handleWheel}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={() => {
+          painting.current = false;
+          marqueeStart.current = null;
+          pendingDrag.current = null;
+          drag.current = null;
+          setDragDelta(null);
+          setMarquee(null);
+          setHover(null);
+        }}
+      >
+        <Layer>
+          <Rect x={0} y={0} width={gridW} height={gridH} fill="#eceff1" stroke="#b0bec5" />
+          {/* Grid lines */}
+          {Array.from({ length: scene.grid.width + 1 }, (_, i) => (
+            <Line
+              key={`v${i}`}
+              points={[i * TILE, 0, i * TILE, gridH]}
+              stroke="#cfd8dc"
+              strokeWidth={1}
+            />
+          ))}
+          {Array.from({ length: scene.grid.height + 1 }, (_, i) => (
+            <Line
+              key={`h${i}`}
+              points={[0, i * TILE, gridW, i * TILE]}
+              stroke="#cfd8dc"
+              strokeWidth={1}
+            />
+          ))}
+        </Layer>
+
+        <Layer>
+          {/* Walls (auto-connected via scene connection flags) */}
+          {scene.walls.map((wall) => (
+            <WallPiece
+              key={wall.id}
+              wall={wall}
+              selected={controller.selectedIds.includes(wall.id)}
+              broken={replayState?.brokenWallIds.has(wall.id) ?? false}
+            />
+          ))}
+          {/* Buildings */}
+          {scene.buildings.map((b) => {
+            const selected = controller.selectedIds.includes(b.id);
+            const destroyed = replayState?.destroyedBuildingIds.has(b.id) ?? false;
+            return (
+              <Group key={b.id} opacity={destroyed ? 0.25 : 1}>
+                <Rect
+                  x={b.bounds.x * TILE}
+                  y={b.bounds.y * TILE}
+                  width={b.bounds.width * TILE}
+                  height={b.bounds.height * TILE}
+                  cornerRadius={3}
+                  fill={destroyed ? "#5a5a5a" : categoryColor(b.category)}
+                  opacity={0.9}
+                  stroke={selected ? "#ffd600" : "#263238"}
+                  strokeWidth={selected ? 3 : 1}
+                />
+                <Text
+                  x={b.bounds.x * TILE}
+                  y={b.bounds.y * TILE}
+                  width={b.bounds.width * TILE}
+                  height={b.bounds.height * TILE}
+                  text={categorySymbol(b.category)}
+                  fill="#ffffff"
+                  align="center"
+                  verticalAlign="middle"
+                  fontSize={TILE * 0.7}
+                  fontStyle="bold"
+                  listening={false}
+                />
+              </Group>
+            );
+          })}
+
+          {/* Hover / placement preview */}
+          {hover && <PlacementPreview controller={controller} catalog={catalog} tile={hover} />}
+
+          {/* Drag-to-move ghost: selected buildings offset by the live delta */}
+          {drag.current &&
+            dragDelta &&
+            (dragDelta.x !== 0 || dragDelta.y !== 0) &&
+            scene.buildings
+              .filter((b) => drag.current?.ids.includes(b.id))
+              .map((b) => (
+                <Rect
+                  key={`ghost-${b.id}`}
+                  x={(b.bounds.x + dragDelta.x) * TILE}
+                  y={(b.bounds.y + dragDelta.y) * TILE}
+                  width={b.bounds.width * TILE}
+                  height={b.bounds.height * TILE}
+                  cornerRadius={3}
+                  fill={categoryColor(b.category)}
+                  opacity={0.4}
+                  stroke="#ffd600"
+                  strokeWidth={2}
+                  dash={[4, 4]}
+                  listening={false}
+                />
+              ))}
+
+          {/* Marquee (drag-box) selection outline */}
+          {marquee && (
+            <Rect
+              x={marquee.x * TILE}
+              y={marquee.y * TILE}
+              width={marquee.width * TILE}
+              height={marquee.height * TILE}
+              fill="#4f9cf9"
+              opacity={0.15}
+              stroke="#4f9cf9"
+              strokeWidth={1}
+              dash={[4, 4]}
+              listening={false}
+            />
+          )}
+
+          {/* Deploy markers (chosen troops, before/without a running replay) */}
+          {!replayState &&
+            controller.deployments.map((d, i) => (
+              <Circle
+                key={`deploy-${i}`}
+                x={(d.position.x + 0.5) * TILE}
+                y={(d.position.y + 0.5) * TILE}
+                radius={TILE * 0.3}
+                fill={troopColor(d.troopId)}
+                opacity={0.7}
+                stroke="#04121f"
+                strokeWidth={1}
+                listening={false}
+              />
+            ))}
+
+          {/* Live attacking units during replay */}
+          {replayState?.units.map((u) => (
+            <Circle
+              key={`unit-${u.id}`}
+              x={(u.x + 0.5) * TILE}
+              y={(u.y + 0.5) * TILE}
+              radius={TILE * 0.28}
+              fill={troopColor(u.troopId)}
+              stroke="#04121f"
+              strokeWidth={1}
+              listening={false}
+            />
+          ))}
+        </Layer>
+      </Stage>
+      <div className="cbe-zoom-badge">{Math.round(scale * 100)}%</div>
+    </div>
+  );
+}
+
+/** A wall tile that visually bridges to its connected neighbours (auto-connect). */
+function WallPiece({
+  wall,
+  selected,
+  broken,
+}: {
+  wall: SceneWall;
+  selected: boolean;
+  broken: boolean;
+}): JSX.Element {
+  const x = wall.position.x * TILE;
+  const y = wall.position.y * TILE;
+  const inset = 3;
+  const size = TILE - inset * 2;
+  const color = WALL_COLOR;
+  const { connections } = wall;
+  return (
+    <Group opacity={broken ? 0.2 : 1}>
+      {selected && (
+        <Rect
+          x={x}
+          y={y}
+          width={TILE}
+          height={TILE}
+          cornerRadius={2}
+          stroke="#ffd600"
+          strokeWidth={2}
+          listening={false}
+        />
+      )}
+      <Rect x={x + inset} y={y + inset} width={size} height={size} cornerRadius={2} fill={color} />
+      {connections.north && <Rect x={x + inset} y={y} width={size} height={inset} fill={color} />}
+      {connections.south && (
+        <Rect x={x + inset} y={y + TILE - inset} width={size} height={inset} fill={color} />
+      )}
+      {connections.west && <Rect x={x} y={y + inset} width={inset} height={size} fill={color} />}
+      {connections.east && (
+        <Rect x={x + TILE - inset} y={y + inset} width={inset} height={size} fill={color} />
+      )}
+    </Group>
+  );
+}
+
+function PlacementPreview({
+  controller,
+  catalog,
+  tile,
+}: {
+  controller: EditorController;
+  catalog: BuildingCatalog;
+  tile: GridVec;
+}): JSX.Element | null {
+  const { tool, placingDefinitionId, rotation } = controller;
+  if (tool === "place" && placingDefinitionId) {
+    const def = catalog.get(placingDefinitionId);
+    if (!def) return null;
+    const { bounds } = computeFootprint(def, tile, rotation);
+    return (
+      <Rect
+        x={bounds.x * TILE}
+        y={bounds.y * TILE}
+        width={bounds.width * TILE}
+        height={bounds.height * TILE}
+        cornerRadius={3}
+        fill={categoryColor(def.category)}
+        opacity={0.4}
+        listening={false}
+      />
+    );
+  }
+  if (tool === "wall" || tool === "delete") {
+    return (
+      <Rect
+        x={tile.x * TILE}
+        y={tile.y * TILE}
+        width={TILE}
+        height={TILE}
+        fill={tool === "delete" ? "#e53935" : WALL_COLOR}
+        opacity={0.35}
+        listening={false}
+      />
+    );
+  }
+  return null;
+}

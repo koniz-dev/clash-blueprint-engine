@@ -1,0 +1,30 @@
+{
+  "name": "@clash/example-pipeline",
+  "version": "0.1.0",
+  "private": true,
+  "description": "End-to-end integration example: data → import → validate → render → export → re-import.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@clash/ai": "workspace:*",
+    "@clash/analyzer": "workspace:*",
+    "@clash/engine": "workspace:*",
+    "@clash/exporter": "workspace:*",
+    "@clash/importer": "workspace:*",
+    "@clash/plugins": "workspace:*",
+    "@clash/renderer": "workspace:*",
+    "@clash/rules-engine": "workspace:*",
+    "@clash/simulation": "workspace:*",
+    "@clash/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}

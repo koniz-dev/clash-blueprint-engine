@@ -1,0 +1,90 @@
+[
+  {
+    "id": "cannon",
+    "name": "Cannon",
+    "category": "defense",
+    "width": 3,
+    "height": 3,
+    "minTier": 1,
+    "attackRange": 9,
+    "damageType": "single",
+    "targets": ["ground"]
+  },
+  {
+    "id": "archer_tower",
+    "name": "Archer Tower",
+    "category": "defense",
+    "width": 3,
+    "height": 3,
+    "minTier": 2,
+    "attackRange": 10,
+    "damageType": "single",
+    "targets": ["ground", "air"]
+  },
+  {
+    "id": "mortar",
+    "name": "Mortar",
+    "category": "defense",
+    "width": 3,
+    "height": 3,
+    "minTier": 3,
+    "attackRange": 11,
+    "damageType": "splash",
+    "targets": ["ground"]
+  },
+  {
+    "id": "air_defense",
+    "name": "Air Defense",
+    "category": "defense",
+    "width": 3,
+    "height": 3,
+    "minTier": 4,
+    "attackRange": 10,
+    "damageType": "single",
+    "targets": ["air"]
+  },
+  {
+    "id": "wizard_tower",
+    "name": "Wizard Tower",
+    "category": "defense",
+    "width": 3,
+    "height": 3,
+    "minTier": 5,
+    "attackRange": 7,
+    "damageType": "splash",
+    "targets": ["ground", "air"]
+  },
+  {
+    "id": "hidden_tesla",
+    "name": "Hidden Tesla",
+    "category": "defense",
+    "width": 2,
+    "height": 2,
+    "minTier": 7,
+    "attackRange": 6,
+    "damageType": "single",
+    "targets": ["ground", "air"]
+  },
+  {
+    "id": "air_sweeper",
+    "name": "Air Sweeper",
+    "category": "defense",
+    "width": 2,
+    "height": 2,
+    "minTier": 6,
+    "attackRange": 15,
+    "damageType": "none",
+    "targets": ["air"]
+  },
+  {
+    "id": "x_bow",
+    "name": "X-Bow",
+    "category": "defense",
+    "width": 3,
+    "height": 3,
+    "minTier": 9,
+    "attackRange": 14,
+    "damageType": "single",
+    "targets": ["ground", "air"]
+  }
+]

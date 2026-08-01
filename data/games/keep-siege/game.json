@@ -1,0 +1,21 @@
+{
+  "id": "keep-siege",
+  "name": "Keep Siege",
+  "tier": { "label": "Keep Level", "shortLabel": "KL", "min": 1, "max": 10 },
+  "coreCategory": "keep",
+  "wall": { "hitpoints": 200, "label": "Palisade" },
+  "categories": [
+    { "id": "keep", "label": "Keep", "order": 0, "hitpoints": 2000 },
+    { "id": "turret", "label": "Turret", "order": 1, "hitpoints": 350 },
+    { "id": "vault", "label": "Vault", "order": 2, "hitpoints": 700, "roles": ["storage"] },
+    { "id": "barracks", "label": "Barracks", "order": 3, "hitpoints": 300 },
+    {
+      "id": "snare",
+      "label": "Snare",
+      "order": 4,
+      "hitpoints": 1,
+      "passable": true,
+      "targetable": false
+    }
+  ]
+}

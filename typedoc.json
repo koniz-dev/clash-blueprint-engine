@@ -1,0 +1,23 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "Clash Blueprint Engine API",
+  "entryPoints": [
+    "packages/shared/src/index.ts",
+    "packages/engine/src/index.ts",
+    "packages/plugins/src/index.ts",
+    "packages/renderer/src/index.ts",
+    "packages/exporter/src/index.ts",
+    "packages/importer/src/index.ts",
+    "packages/rules-engine/src/index.ts",
+    "packages/analyzer/src/index.ts",
+    "packages/simulation/src/index.ts",
+    "packages/ai/src/index.ts"
+  ],
+  "out": "docs/api",
+  "tsconfig": "tsconfig.base.json",
+  "readme": "none",
+  "excludeExternals": true,
+  "excludePrivate": true,
+  "skipErrorChecking": true,
+  "githubPages": false
+}

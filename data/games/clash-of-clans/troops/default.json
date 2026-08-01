@@ -1,0 +1,81 @@
+[
+  {
+    "id": "barbarian",
+    "name": "Barbarian",
+    "hitpoints": 45,
+    "damagePerSecond": 8,
+    "moveSpeed": 2,
+    "attackRange": 1,
+    "movement": "ground",
+    "housingSpace": 1,
+    "ignoresWalls": false
+  },
+  {
+    "id": "archer",
+    "name": "Archer",
+    "hitpoints": 20,
+    "damagePerSecond": 7,
+    "moveSpeed": 2,
+    "attackRange": 3.5,
+    "movement": "ground",
+    "housingSpace": 1,
+    "ignoresWalls": false
+  },
+  {
+    "id": "giant",
+    "name": "Giant",
+    "hitpoints": 300,
+    "damagePerSecond": 11,
+    "moveSpeed": 1,
+    "attackRange": 1,
+    "movement": "ground",
+    "housingSpace": 5,
+    "favoriteTarget": "defense",
+    "ignoresWalls": false
+  },
+  {
+    "id": "wizard",
+    "name": "Wizard",
+    "hitpoints": 75,
+    "damagePerSecond": 30,
+    "moveSpeed": 1.6,
+    "attackRange": 3,
+    "movement": "ground",
+    "housingSpace": 4,
+    "ignoresWalls": false
+  },
+  {
+    "id": "dragon",
+    "name": "Dragon",
+    "hitpoints": 800,
+    "damagePerSecond": 100,
+    "moveSpeed": 1.5,
+    "attackRange": 3,
+    "movement": "air",
+    "housingSpace": 20,
+    "ignoresWalls": true
+  },
+  {
+    "id": "pekka",
+    "name": "P.E.K.K.A",
+    "hitpoints": 900,
+    "damagePerSecond": 90,
+    "moveSpeed": 1,
+    "attackRange": 1,
+    "movement": "ground",
+    "housingSpace": 25,
+    "ignoresWalls": false
+  },
+  {
+    "id": "hog_rider",
+    "name": "Hog Rider",
+    "hitpoints": 200,
+    "damagePerSecond": 40,
+    "moveSpeed": 3,
+    "attackRange": 1,
+    "movement": "ground",
+    "housingSpace": 5,
+    "favoriteTarget": "defense",
+    "ignoresWalls": true
+  }
+]

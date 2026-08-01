@@ -1,0 +1,50 @@
+[
+  {
+    "id": "bomb",
+    "name": "Bomb",
+    "category": "trap",
+    "width": 1,
+    "height": 1,
+    "minTier": 3,
+    "damageType": "splash",
+    "targets": ["ground"]
+  },
+  {
+    "id": "spring_trap",
+    "name": "Spring Trap",
+    "category": "trap",
+    "width": 1,
+    "height": 1,
+    "minTier": 4,
+    "targets": ["ground"]
+  },
+  {
+    "id": "air_bomb",
+    "name": "Air Bomb",
+    "category": "trap",
+    "width": 1,
+    "height": 1,
+    "minTier": 5,
+    "damageType": "splash",
+    "targets": ["air"]
+  },
+  {
+    "id": "giant_bomb",
+    "name": "Giant Bomb",
+    "category": "trap",
+    "width": 2,
+    "height": 2,
+    "minTier": 6,
+    "damageType": "splash",
+    "targets": ["ground"]
+  },
+  {
+    "id": "seeking_air_mine",
+    "name": "Seeking Air Mine",
+    "category": "trap",
+    "width": 1,
+    "height": 1,
+    "minTier": 7,
+    "targets": ["air"]
+  }
+]

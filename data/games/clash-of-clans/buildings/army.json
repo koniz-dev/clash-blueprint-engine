@@ -1,0 +1,42 @@
+[
+  {
+    "id": "army_camp",
+    "name": "Army Camp",
+    "category": "army",
+    "width": 4,
+    "height": 4,
+    "minTier": 1
+  },
+  {
+    "id": "barracks",
+    "name": "Barracks",
+    "category": "army",
+    "width": 3,
+    "height": 3,
+    "minTier": 1
+  },
+  {
+    "id": "dark_barracks",
+    "name": "Dark Barracks",
+    "category": "army",
+    "width": 3,
+    "height": 3,
+    "minTier": 7
+  },
+  {
+    "id": "laboratory",
+    "name": "Laboratory",
+    "category": "army",
+    "width": 3,
+    "height": 3,
+    "minTier": 3
+  },
+  {
+    "id": "spell_factory",
+    "name": "Spell Factory",
+    "category": "army",
+    "width": 3,
+    "height": 3,
+    "minTier": 5
+  }
+]

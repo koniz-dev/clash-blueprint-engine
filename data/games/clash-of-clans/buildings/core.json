@@ -1,0 +1,18 @@
+[
+  {
+    "id": "town_hall",
+    "name": "Town Hall",
+    "category": "townhall",
+    "width": 4,
+    "height": 4,
+    "minTier": 1
+  },
+  {
+    "id": "clan_castle",
+    "name": "Clan Castle",
+    "category": "army",
+    "width": 3,
+    "height": 3,
+    "minTier": 3
+  }
+]

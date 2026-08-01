@@ -1,0 +1,38 @@
+{
+  "name": "clash-blueprint-engine",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A production-grade, framework-independent engine for designing, validating, analyzing and simulating Clash of Clans village layouts.",
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "pnpm@11.7.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "test:watch": "turbo run test:watch",
+    "typecheck": "turbo run typecheck",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "bench": "turbo run bench",
+    "docs:api": "typedoc",
+    "clean": "turbo run clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.14.0",
+    "eslint": "^9.14.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "globals": "^15.12.0",
+    "prettier": "^3.3.3",
+    "tsup": "^8.3.0",
+    "turbo": "^2.5.0",
+    "typedoc": "^0.28.0",
+    "typescript": "^5.6.0",
+    "typescript-eslint": "^8.14.0",
+    "vitest": "^2.1.0"
+  }
+}

@@ -1,0 +1,50 @@
+[
+  {
+    "id": "gold_mine",
+    "name": "Gold Mine",
+    "category": "resource",
+    "width": 3,
+    "height": 3,
+    "minTier": 1
+  },
+  {
+    "id": "elixir_collector",
+    "name": "Elixir Collector",
+    "category": "resource",
+    "width": 3,
+    "height": 3,
+    "minTier": 1
+  },
+  {
+    "id": "dark_elixir_drill",
+    "name": "Dark Elixir Drill",
+    "category": "resource",
+    "width": 3,
+    "height": 3,
+    "minTier": 7
+  },
+  {
+    "id": "gold_storage",
+    "name": "Gold Storage",
+    "category": "storage",
+    "width": 3,
+    "height": 3,
+    "minTier": 1
+  },
+  {
+    "id": "elixir_storage",
+    "name": "Elixir Storage",
+    "category": "storage",
+    "width": 3,
+    "height": 3,
+    "minTier": 1
+  },
+  {
+    "id": "dark_elixir_storage",
+    "name": "Dark Elixir Storage",
+    "category": "storage",
+    "width": 3,
+    "height": 3,
+    "minTier": 7
+  }
+]

@@ -1,0 +1,48 @@
+{
+  "grid": { "width": 44, "height": 44 },
+  "tier": 8,
+  "buildings": [
+    { "id": "b1", "definitionId": "town_hall", "position": { "x": 20, "y": 20 }, "rotation": 0 },
+    { "id": "b2", "definitionId": "clan_castle", "position": { "x": 20, "y": 15 }, "rotation": 0 },
+    { "id": "b3", "definitionId": "cannon", "position": { "x": 14, "y": 20 }, "rotation": 0 },
+    { "id": "b4", "definitionId": "cannon", "position": { "x": 27, "y": 20 }, "rotation": 0 },
+    { "id": "b5", "definitionId": "archer_tower", "position": { "x": 20, "y": 27 }, "rotation": 0 },
+    { "id": "b6", "definitionId": "archer_tower", "position": { "x": 16, "y": 14 }, "rotation": 0 },
+    { "id": "b7", "definitionId": "mortar", "position": { "x": 24, "y": 24 }, "rotation": 0 },
+    { "id": "b8", "definitionId": "air_defense", "position": { "x": 14, "y": 26 }, "rotation": 0 },
+    { "id": "b9", "definitionId": "wizard_tower", "position": { "x": 26, "y": 14 }, "rotation": 0 },
+    {
+      "id": "b10",
+      "definitionId": "gold_storage",
+      "position": { "x": 10, "y": 10 },
+      "rotation": 0
+    },
+    {
+      "id": "b11",
+      "definitionId": "elixir_storage",
+      "position": { "x": 31, "y": 10 },
+      "rotation": 0
+    },
+    {
+      "id": "b12",
+      "definitionId": "dark_elixir_storage",
+      "position": { "x": 31, "y": 31 },
+      "rotation": 0
+    }
+  ],
+  "walls": [
+    { "id": "w1", "position": { "x": 18, "y": 18 } },
+    { "id": "w2", "position": { "x": 19, "y": 18 } },
+    { "id": "w3", "position": { "x": 20, "y": 18 } },
+    { "id": "w4", "position": { "x": 21, "y": 18 } },
+    { "id": "w5", "position": { "x": 22, "y": 18 } },
+    { "id": "w6", "position": { "x": 23, "y": 18 } },
+    { "id": "w7", "position": { "x": 24, "y": 18 } },
+    { "id": "w8", "position": { "x": 25, "y": 18 } },
+    { "id": "w9", "position": { "x": 18, "y": 19 } },
+    { "id": "w10", "position": { "x": 18, "y": 20 } },
+    { "id": "w11", "position": { "x": 18, "y": 21 } },
+    { "id": "w12", "position": { "x": 18, "y": 22 } },
+    { "id": "w13", "position": { "x": 18, "y": 23 } }
+  ]
+}

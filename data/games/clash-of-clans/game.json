@@ -1,0 +1,22 @@
+{
+  "id": "clash-of-clans",
+  "name": "Clash of Clans",
+  "tier": { "label": "Town Hall", "shortLabel": "TH", "min": 1, "max": 15 },
+  "coreCategory": "townhall",
+  "wall": { "hitpoints": 300, "label": "Wall" },
+  "categories": [
+    { "id": "townhall", "label": "Town Hall", "order": 0, "hitpoints": 1500 },
+    { "id": "defense", "label": "Defense", "order": 1, "hitpoints": 400 },
+    { "id": "resource", "label": "Resource", "order": 2, "hitpoints": 400 },
+    { "id": "storage", "label": "Storage", "order": 3, "hitpoints": 800, "roles": ["storage"] },
+    { "id": "army", "label": "Army", "order": 4, "hitpoints": 350 },
+    {
+      "id": "trap",
+      "label": "Trap",
+      "order": 5,
+      "hitpoints": 1,
+      "passable": true,
+      "targetable": false
+    }
+  ]
+}
