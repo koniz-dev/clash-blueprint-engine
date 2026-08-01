@@ -38,9 +38,7 @@ export function OpenMenu({ controller }: { controller: EditorController }): JSX.
           {/* Click-away backdrop. */}
           <div className="cbe-menu-backdrop" onClick={() => setOpen(false)} />
           <div className="cbe-menu-panel" role="menu">
-            {templates.length > 0 && (
-              <div className="cbe-menu-section">{t("open.templates")}</div>
-            )}
+            {templates.length > 0 && <div className="cbe-menu-section">{t("open.templates")}</div>}
             {templates.map((tpl) => (
               <button
                 key={tpl.id}

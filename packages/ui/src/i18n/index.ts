@@ -85,5 +85,9 @@ export function I18nProvider({
 export function useI18n(): I18n {
   const ctx = useContext(I18nContext);
   if (ctx) return ctx;
-  return { locale: "en", setLocale: () => {}, t: (key, params) => interpolate(en[key] ?? key, params) };
+  return {
+    locale: "en",
+    setLocale: () => {},
+    t: (key, params) => interpolate(en[key] ?? key, params),
+  };
 }
