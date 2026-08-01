@@ -11,6 +11,21 @@ until a tagged release is cut.
 
 ### Added
 
+- **Undo-history panel** with click-to-jump, over a read-only
+  `CommandStack.entries` projection. (U3a)
+- **glTF 2.0 exporter** (`createGltfExporter`, behind the `Exporter` port) — export
+  the 3D layout as a self-contained `.gltf`. (U3b)
+- **Touch/pointer support** for the canvas (tap/drag/marquee/pan on touch + pen)
+  with two-finger pinch-to-zoom. (U3c)
+- **i18n scaffolding** (English + Vietnamese) with a `LanguageSwitcher`; toolbar
+  and panel strings externalized into typed catalogs. (U3d)
+- **keep-siege** second-game pack fleshed out to Keep Levels 1–5 and two starter
+  templates — all pure data. (U4)
+- **Unit tests for the extracted editor hooks** and an 80% coverage gate on
+  `@clash/ui` logic modules. (U1)
+- **Repo/CI hardening:** Dependabot, CodeQL scanning, a coverage gate in CI, a
+  GitHub Pages deploy for the TypeDoc API docs, issue/PR templates, `SECURITY.md`
+  and this changelog. (U2)
 - **Versioned, migratable save format.** Persisted layouts (JSON export and the
   editor's autosave) carry an explicit `formatVersion`; a migration registry
   upgrades old payloads forward on load, and unknown/too-new/corrupt files fail
