@@ -22,10 +22,11 @@ describe("loadGamePack (real Clash of Clans pack)", () => {
     expect(pack.catalog.has("town_hall")).toBe(true);
     expect(pack.catalog.has("x_bow")).toBe(true);
     expect(pack.catalog.has("giant_bomb")).toBe(true);
-    // Both tier rule packs loaded and indexed by tier.
-    expect(pack.ruleSets.has(8)).toBe(true);
-    expect(pack.ruleSets.has(9)).toBe(true);
+    // Every tier rule pack in rules/ loads and is indexed by tier. Adding a
+    // new pack file (validated against the catalog here) is a pure data change.
+    for (const tier of [8, 9, 10, 11]) expect(pack.ruleSets.has(tier)).toBe(true);
     expect(pack.ruleSets.get(8)?.wallLimit).toBe(225);
+    expect(pack.ruleSets.get(11)?.wallLimit).toBe(300);
     // The starter template is available.
     expect(pack.templates.has("starter")).toBe(true);
   });

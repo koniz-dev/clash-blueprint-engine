@@ -109,3 +109,15 @@ their stats, not their category name.
 The `keep-siege` pack plus
 [`examples/pipeline/src/demo-game.test.ts`](../examples/pipeline/src/demo-game.test.ts)
 are a complete, tested worked example.
+
+## Bundled Clash of Clans data
+
+`data/games/clash-of-clans/` ships rule packs for **Town Hall 8–11**
+(`rules/tier-8.json` … `tier-11.json`). Adding another Town Hall is a pure data
+change: drop a `rules/tier-N.json` into the folder and it is loaded and validated
+against the catalog by `loadGamePack` (and by the loader test).
+
+> **Not official.** The building counts, wall limits and stats in these packs are
+> **illustrative** — internally consistent values for exercising the engine, not
+> the game's real numbers. Treat them as a starting point to tune, not a
+> reference.
