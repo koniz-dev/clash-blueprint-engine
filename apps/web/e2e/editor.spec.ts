@@ -31,6 +31,36 @@ test.describe("Editor smoke", () => {
     await expect(page.getByText("BuildingDeleted").first()).toBeVisible();
   });
 
+  test("surfaces live rule feedback when placing past a limit (no Validate press)", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await page
+      .getByRole("button", { name: /Cannon/ })
+      .first()
+      .click();
+
+    const surface = page.locator(".cbe-canvas");
+    await expect(surface).toBeVisible();
+
+    // Place 7 cannons on spaced, non-overlapping tiles (TH8 allows 6).
+    const spots = [
+      { x: 60, y: 60 },
+      { x: 160, y: 60 },
+      { x: 260, y: 60 },
+      { x: 360, y: 60 },
+      { x: 460, y: 60 },
+      { x: 60, y: 160 },
+      { x: 160, y: 160 },
+    ];
+    for (const position of spots) await surface.click({ position, force: true });
+
+    // WITHOUT pressing "Validate": the library badge is over its max (7/<max>)…
+    await expect(page.locator(".cbe-lib-count-max").first()).toHaveText(/^7\/\d+$/);
+    // …and the live Validation panel shows the over-limit error.
+    await expect(page.getByText(/Too many Cannon/)).toBeVisible();
+  });
+
   test("runs analysis and shows a defense score", async ({ page }) => {
     await page.goto("/");
     await page

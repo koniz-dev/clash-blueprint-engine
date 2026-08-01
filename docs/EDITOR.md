@@ -24,8 +24,8 @@ apps/web (Next.js, client shell)
 
 @clash/ui (React binding + components)
   useEditor.ts        THE binding — owns one VillageEditor and composes the hooks below
-  hooks/              focused hooks: useSelection, useClipboard, useQueries, useReplay,
-                      useKeyboardShortcuts, usePersistence, useHelp, useDiscardGuard, useEngineBinding, useLog
+  hooks/              focused hooks: useSelection, useClipboard, useQueries, useLiveValidation,
+                      useReplay, useKeyboardShortcuts, usePersistence, useHelp, useDiscardGuard, useEngineBinding, useLog
   EditorCanvas.tsx    Konva view over controller.scene; turns pointer input into controller actions
   Toolbar / BuildingLibrary / Panels   presentational, read controller state, call controller actions
   EditorApp.tsx       composition only
@@ -118,6 +118,30 @@ a Vue or Svelte hook, a CLI, or tests with no change to the core.
 - **Bottom panel**: a live log of engine events and errors — the `EventStore`
   timeline made visible.
 
+## Live rule feedback
+
+Game-rule checking is **continuous**, not a place-then-check loop. `useLiveValidation`
+(a hook under `hooks/`) runs the **pure** `ValidationEngine.validate` — which
+records no event — keyed off the engine `version` counter and **debounced ~80ms**
+so the Wall tool's per-tile bursts coalesce. It derives a small read model on the
+controller (`liveValidation`): the `report`, a per-building `severityById` map
+(error/warning), and a `perDefinition` map (`count` vs. allowance, `allowed`,
+`unlocked`, `atMax`). It is a thin projection — **no game logic in React**.
+
+Four surfaces consume it, all **advisory** (placement is never blocked):
+
+- **Validation panel** updates in real time (no "Validate" press).
+- **Building library** shows a live **`count/max`** badge per item and dims/flags
+  items that are **🔒 Locked** (below the pack's tier) or **at max**.
+- **Canvas** outlines rule-violating buildings — **red** (error) / **amber**
+  (warning); the selection highlight still wins.
+- **Placement preview** tints **red** when placing the current building would
+  break a count/unlock rule.
+
+Suggestions stay panel-only (never inline, to avoid clutter). The toolbar
+**Validate** button keeps only its distinct job: `validateAndRecord`, stamping a
+`LayoutValidated` **checkpoint** on the timeline.
+
 ## 3D view
 
 A **2D / 3D** toggle in the toolbar swaps the centre pane between the Konva 2D
@@ -164,15 +188,15 @@ expected shortcut (locking behavior).
 
 **Bindings**
 
-| Group     | Action                         | Keys                  |
-| --------- | ------------------------------ | --------------------- |
-| Edit      | Undo / Redo                    | ⌘Z · ⌘⇧Z / ⌘Y         |
-| Edit      | Copy / Paste                   | ⌘C / ⌘V               |
-| Selection | Delete selection               | Del / ⌫               |
-| Selection | Nudge selection                | ↑ ↓ ← →               |
-| Selection | Rotate selection               | R                     |
+| Group     | Action                                | Keys                        |
+| --------- | ------------------------------------- | --------------------------- |
+| Edit      | Undo / Redo                           | ⌘Z · ⌘⇧Z / ⌘Y               |
+| Edit      | Copy / Paste                          | ⌘C / ⌘V                     |
+| Selection | Delete selection                      | Del / ⌫                     |
+| Selection | Nudge selection                       | ↑ ↓ ← →                     |
+| Selection | Rotate selection                      | R                           |
 | Tools     | Select / Place / Wall / Delete / Hand | V·1 / P·2 / W·3 / D·4 / H·5 |
-| View      | Show shortcuts                 | ?                     |
+| View      | Show shortcuts                        | ?                           |
 
 Plus mouse gestures (drag = marquee, drag a building = move, Shift+click =
 add/remove, Space+drag = pan, wheel = zoom), also listed in the overlay.
