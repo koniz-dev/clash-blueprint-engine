@@ -98,7 +98,8 @@ a Vue or Svelte hook, a CLI, or tests with no change to the core.
   timeline (interpolated troop dots, buildings dimming as they fall, walls
   breaking) with **play/pause/scrub/speed**. See [Attack replay](#attack-replay).
 - **Toolbar**: New, Open, Undo, Redo, Validate, Analyze, AI Suggest, Export JSON
-  / ASCII / **PNG** (retina 2×; the SVG render rasterized to a canvas).
+  / ASCII / **PNG** (retina 2×; the SVG render rasterized to a canvas) / **glTF**
+  (the 3D layout as a self-contained glTF 2.0 model, via the `Exporter` port).
 - **Left panel**: building library grouped by category.
 - **Undo-history panel**: a read-only projection of the engine's command stack
   (`CommandStack.entries`) — applied commands oldest→newest with the current

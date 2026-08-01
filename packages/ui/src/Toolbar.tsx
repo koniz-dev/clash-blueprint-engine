@@ -113,6 +113,13 @@ export function Toolbar({ controller }: { controller: EditorController }): JSX.E
         >
           Export PNG
         </button>
+        <button
+          className="cbe-btn"
+          title="3D model (glTF 2.0)"
+          onClick={() => downloadExport(actions.exportGltf())}
+        >
+          Export glTF
+        </button>
       </div>
 
       <div className="cbe-toolbar-group cbe-toolbar-help">

@@ -10,7 +10,13 @@ import {
   type VillageSnapshot,
 } from "@clash/engine";
 import { brand, type GridVec } from "@clash/shared";
-import { asciiRenderer, buildDocument, buildScene, svgRenderer } from "@clash/renderer";
+import {
+  asciiRenderer,
+  buildDocument,
+  buildScene,
+  createGltfExporter,
+  svgRenderer,
+} from "@clash/renderer";
 import { createPngExporter, jsonExporter, rendererExporter } from "@clash/exporter";
 import { jsonImporter } from "@clash/importer";
 import type { RuleSet } from "@clash/rules-engine";
@@ -299,6 +305,11 @@ export function useEditor(options: UseEditorOptions) {
     return rendererExporter(asciiRenderer).export(doc, "layout");
   }, [editor, catalog]);
 
+  const exportGltf = useCallback(() => {
+    const doc = buildDocument(editor.village, catalog);
+    return createGltfExporter({ coreCategory: rules.coreCategory }).export(doc, "layout");
+  }, [editor, catalog, rules.coreCategory]);
+
   const exportPng = useCallback(
     (scale?: number): Promise<ExportResult> => {
       const doc = buildDocument(editor.village, catalog);
@@ -411,6 +422,7 @@ export function useEditor(options: UseEditorOptions) {
       exportJson,
       exportAscii,
       exportPng,
+      exportGltf,
       // Help overlay + hint.
       openHelp: help.openHelp,
       closeHelp: help.closeHelp,

@@ -270,6 +270,21 @@ test.describe("Editor smoke", () => {
     await expect(page.getByText("BuildingDeleted").first()).toBeVisible();
   });
 
+  test("exports the layout as a glTF 3D model", async ({ page }) => {
+    await page.goto("/");
+    await page
+      .getByRole("button", { name: /Cannon/ })
+      .first()
+      .click();
+    await page.locator(".cbe-canvas").click({ position: { x: 220, y: 220 }, force: true });
+    await expect(page.getByText("BuildingPlaced").first()).toBeVisible();
+
+    const downloadPromise = page.waitForEvent("download");
+    await page.getByRole("button", { name: "Export glTF" }).click();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toBe("layout.gltf");
+  });
+
   test("switches to the 3D view and mounts a WebGL canvas without crashing", async ({ page }) => {
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(String(e)));

@@ -113,6 +113,10 @@ Duplicate ids are rejected, so two plugins can't silently shadow each other.
   pipeline test.
 - **`rendererExporter(renderer)`** turns _any_ renderer into a file exporter.
   Register a new renderer and you get a new export format for free.
+- **`createGltfExporter({ coreCategory })`** exports the layout's 3D geometry as a
+  self-contained **glTF 2.0** model (via `build3DModel` + `toGltf`, both pure and
+  three-free). It implements the same `Exporter` port, so the editor downloads a
+  `.gltf` you can open in Blender, three.js, or any glTF viewer.
 
 ## One renderer = one exporter: writing your own
 

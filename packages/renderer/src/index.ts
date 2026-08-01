@@ -6,6 +6,7 @@ export {
   type WallSegment3D,
   type Build3DOptions,
 } from "./scene3d.js";
+export { toGltf, createGltfExporter } from "./gltf.js";
 export { asciiRenderer } from "./renderers/ascii.js";
 export { svgRenderer } from "./renderers/svg.js";
 export { mermaidRenderer } from "./renderers/mermaid.js";
