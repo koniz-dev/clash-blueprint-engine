@@ -67,6 +67,7 @@ export const vi: Messages = {
   "validation.empty": "Bấm “Kiểm tra” để rà soát bố cục.",
   "validation.ok": "Không có vấn đề — bố cục hợp lệ.",
   "validation.noRuleSet": "Chưa nạp bộ luật — không thể kiểm tra.",
+  "toolbar.validate.hint": "Ghi một mốc kiểm tra (bảng đã cập nhật trực tiếp)",
 
   "analysis.empty": "Bấm “Phân tích” để xem đánh giá phòng thủ.",
 

@@ -89,7 +89,11 @@ export function Toolbar({ controller }: { controller: EditorController }): JSX.E
       </div>
 
       <div className="cbe-toolbar-group">
-        <button className="cbe-btn" onClick={actions.runValidation}>
+        <button
+          className="cbe-btn"
+          onClick={actions.runValidation}
+          title={t("toolbar.validate.hint")}
+        >
           {t("toolbar.validate")}
         </button>
         <button className="cbe-btn" onClick={actions.runAnalysis}>
