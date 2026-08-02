@@ -25,7 +25,7 @@ apps/web (Next.js, client shell)
 @clash/ui (React binding + components)
   useEditor.ts        THE binding — owns one VillageEditor and composes the hooks below
   hooks/              focused hooks: useSelection, useClipboard, useQueries, useLiveValidation, useLiveAnalysis,
-                      useReplay, useKeyboardShortcuts, usePersistence, useHelp, useDiscardGuard, useEngineBinding, useLog
+                      useOverlays, useOverlayPrefs, useReplay, useKeyboardShortcuts, usePersistence, useHelp, useDiscardGuard, useEngineBinding, useLog
   EditorCanvas.tsx    Konva view over controller.scene; turns pointer input into controller actions
   Toolbar / BuildingLibrary / Panels   presentational, read controller state, call controller actions
   EditorApp.tsx       composition only
@@ -166,6 +166,34 @@ village yields no score** (nothing to grade yet).
 Because the score is live, the old **Analyze** button was removed — it had no
 unique side effect (unlike Validate's checkpoint event), and **AI Suggest**
 already runs the heavier attack-simulation pass.
+
+## Defensive overlays
+
+The spatial companion to the live score: toggleable canvas overlays that show
+_where_ the base is strong or weak. Off by default, each independently toggled
+from the toolbar's **Overlays ▾** popover (persisted in `localStorage`).
+
+- **Coverage** — a translucent green fill over every tile within a defense's
+  range, so undefended gaps are visible.
+- **Compartments** — each walled compartment filled with a distinct cool-hue
+  translucent colour, showing how the base is partitioned.
+- **Dead zones** — a slate cross-hatch over enclosed-but-empty compartments
+  (`Compartment.isDeadZone` — walls protecting nothing).
+
+`useOverlays` (in `hooks/`) mirrors `useLiveAnalysis`: a **pure** `deriveOverlays`
+over the analyzer's pure `buildAnalysisContext` returns renderable geometry
+(`coverageTiles`, coloured `compartments`, `deadZoneTiles`); coverage is derived
+the same way the analyzer's own `isCovered` does (a tile centre within a defense's
+Euclidean range). It is **debounced ~200ms** on the `version` counter and **gated
+on `active`**, so it does no work while every overlay is off. All three overlays
+are **data-backed today** — no analyzer change.
+
+Rendering (`EditorCanvas`) uses **dedicated, non-interactive Konva layers**, each
+drawn by a single `Shape` `sceneFunc` (O(1) nodes regardless of tile count):
+coverage + compartment **fills below the buildings**, the dead-zone hatch **above**
+them. The overlays are subtle/ambient (low opacity, cool hues + a hatch) and
+deliberately kept clear of the three per-building cues — rule **red/amber**, weak
+**violet**, selection **yellow** — so all of them stay readable together.
 
 ## 3D view
 

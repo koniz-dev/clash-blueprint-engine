@@ -96,6 +96,28 @@ test.describe("Editor smoke", () => {
     await expect(page.locator(".cbe-weakpoints .cbe-issue").first()).toBeVisible();
   });
 
+  test("toggles a defensive overlay on and off", async ({ page }) => {
+    await page.goto("/");
+    // Place a defensive building so the coverage overlay has area to draw.
+    await page
+      .getByRole("button", { name: /Cannon/ })
+      .first()
+      .click();
+    await page.locator(".cbe-canvas").click({ position: { x: 220, y: 220 }, force: true });
+
+    // Overlays are off by default.
+    await expect(page.locator(".cbe-canvas[data-overlay-coverage='on']")).toHaveCount(0);
+
+    // Open the Overlays popover and turn Coverage on → the overlay layer renders.
+    await page.getByRole("button", { name: /Overlays/ }).click();
+    await page.getByRole("checkbox", { name: "Coverage" }).check();
+    await expect(page.locator(".cbe-canvas[data-overlay-coverage='on']")).toHaveCount(1);
+
+    // Turn it off → gone.
+    await page.getByRole("checkbox", { name: "Coverage" }).uncheck();
+    await expect(page.locator(".cbe-canvas[data-overlay-coverage='on']")).toHaveCount(0);
+  });
+
   test("drags a placed building to move it as one undoable command", async ({ page }) => {
     await page.goto("/");
 
