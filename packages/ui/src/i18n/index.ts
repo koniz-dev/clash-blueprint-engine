@@ -25,6 +25,21 @@ export function categoryMessageKey(category: string): MessageKey | null {
   return CATEGORY_KEYS[category] ?? null;
 }
 
+/** Message keys for weak-point areas (compass sides, centre, or overall). */
+const DIRECTION_KEYS: Record<string, MessageKey> = {
+  north: "direction.north",
+  east: "direction.east",
+  south: "direction.south",
+  west: "direction.west",
+  center: "direction.center",
+  overall: "direction.overall",
+};
+
+/** The message key for a weak-point area, or `null` if unknown. */
+export function directionMessageKey(area: string): MessageKey | null {
+  return DIRECTION_KEYS[area] ?? null;
+}
+
 /** Values interpolated into a message's `{name}` placeholders. */
 export type MessageParams = Record<string, string | number>;
 

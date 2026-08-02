@@ -73,7 +73,14 @@ export const en = {
   "toolbar.validate.hint": "Record a validation checkpoint (the panel is already live)",
 
   // Defense score
-  "analysis.empty": "Run “Analyze” for a defensive breakdown.",
+  "analysis.empty": "Place buildings to see the live defense score.",
+  "analysis.weakPoints": "Weak points",
+  "direction.north": "North",
+  "direction.east": "East",
+  "direction.south": "South",
+  "direction.west": "West",
+  "direction.center": "Center",
+  "direction.overall": "Overall",
 
   // AI suggestions
   "ai.loading": "Analyzing (simulating attacks)…",

@@ -69,7 +69,14 @@ export const vi: Messages = {
   "validation.noRuleSet": "Chưa nạp bộ luật — không thể kiểm tra.",
   "toolbar.validate.hint": "Ghi một mốc kiểm tra (bảng đã cập nhật trực tiếp)",
 
-  "analysis.empty": "Bấm “Phân tích” để xem đánh giá phòng thủ.",
+  "analysis.empty": "Đặt công trình để xem điểm phòng thủ trực tiếp.",
+  "analysis.weakPoints": "Điểm yếu",
+  "direction.north": "Bắc",
+  "direction.east": "Đông",
+  "direction.south": "Nam",
+  "direction.west": "Tây",
+  "direction.center": "Trung tâm",
+  "direction.overall": "Tổng thể",
 
   "ai.loading": "Đang phân tích (mô phỏng tấn công)…",
   "ai.empty": "Bấm “Gợi ý AI” để nhận đề xuất cải thiện.",

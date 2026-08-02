@@ -679,6 +679,39 @@ body {
   color: #04121f;
 }
 
+/* Analyzer weak points (violet, distinct from rule error/warning) */
+.cbe-weakpoints {
+  margin-top: 10px;
+}
+.cbe-weak-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.cbe-weak-critical .cbe-sev-badge {
+  background: #a970ff;
+  color: #fff;
+}
+.cbe-weak-weak .cbe-sev-badge {
+  background: #6b4fa0;
+  color: #fff;
+}
+.cbe-weak-info .cbe-sev-badge {
+  background: var(--panel-2);
+  color: var(--muted);
+}
+.cbe-weak-area {
+  margin-left: 6px;
+  font-size: 10px;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0 4px;
+  white-space: nowrap;
+}
+
 .cbe-rec {
   padding: 8px 0;
   border-bottom: 1px solid var(--border);

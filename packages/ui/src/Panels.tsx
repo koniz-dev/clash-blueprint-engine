@@ -1,5 +1,5 @@
 import { categoryColor } from "@clash/renderer";
-import { categoryMessageKey, useI18n } from "./i18n";
+import { categoryMessageKey, directionMessageKey, useI18n } from "./i18n";
 import type { EditorController } from "./useEditor";
 
 export function Inspector({ controller }: { controller: EditorController }): JSX.Element {
@@ -121,7 +121,8 @@ export function ValidationPanel({ controller }: { controller: EditorController }
 
 export function AnalysisPanel({ controller }: { controller: EditorController }): JSX.Element {
   const { t } = useI18n();
-  const score = controller.analysis;
+  // Live: derived from the pure analyzer on every change (no "Analyze" needed).
+  const score = controller.liveAnalysis.score;
   return (
     <div className="cbe-panel">
       <h2 className="cbe-panel-title">{t("panel.analysis")}</h2>
@@ -147,6 +148,23 @@ export function AnalysisPanel({ controller }: { controller: EditorController }):
               </div>
             ))}
           </div>
+          {score.weakPoints.length > 0 && (
+            <div className="cbe-weakpoints">
+              <div className="cbe-weak-title">{t("analysis.weakPoints")}</div>
+              <ul className="cbe-issues">
+                {score.weakPoints.map((wp, i) => {
+                  const areaKey = wp.area ? directionMessageKey(wp.area) : null;
+                  return (
+                    <li key={i} className={`cbe-issue cbe-weak-${wp.severity}`}>
+                      <span className="cbe-sev-badge">{wp.severity}</span>
+                      {wp.message}
+                      {areaKey && <span className="cbe-weak-area">{t(areaKey)}</span>}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
         </div>
       )}
     </div>
