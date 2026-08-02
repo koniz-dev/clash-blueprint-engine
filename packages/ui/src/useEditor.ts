@@ -363,7 +363,6 @@ export function useEditor(options: UseEditorOptions) {
     liveValidation,
     // Reactive defense score (score + per-building weak severity + per-area summary).
     liveAnalysis,
-    analysis: queries.analysis,
     ai: queries.ai,
     aiLoading: queries.aiLoading,
     canUndo: editor.history.canUndo,
@@ -410,7 +409,6 @@ export function useEditor(options: UseEditorOptions) {
       importJson,
       loadTemplate,
       runValidation: queries.runValidation,
-      runAnalysis: queries.runAnalysis,
       runAi: queries.runAi,
       // Replay / deploy.
       setDeployMode: replay.setDeployMode,

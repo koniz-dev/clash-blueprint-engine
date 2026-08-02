@@ -23,7 +23,7 @@ describe("useQueries", () => {
     expect(result.current.validation).toBeNull();
   });
 
-  it("runs validation and analysis into panel state", () => {
+  it("runs validation into panel state", () => {
     const pushLog = vi.fn();
     const { result } = renderHook(() =>
       useQueries(
@@ -38,10 +38,6 @@ describe("useQueries", () => {
 
     act(() => result.current.runValidation());
     expect(result.current.validation).not.toBeNull();
-
-    act(() => result.current.runAnalysis());
-    expect(result.current.analysis).not.toBeNull();
-    expect(pushLog).toHaveBeenCalledWith("info", expect.stringMatching(/Defense score/));
   });
 
   it("runs the synchronous AI fallback and resets", async () => {
@@ -61,11 +57,9 @@ describe("useQueries", () => {
       await result.current.runAi();
     });
     await waitFor(() => expect(result.current.ai).not.toBeNull());
-    expect(result.current.analysis).not.toBeNull();
 
     act(() => result.current.reset());
     expect(result.current.validation).toBeNull();
-    expect(result.current.analysis).toBeNull();
     expect(result.current.ai).toBeNull();
   });
 

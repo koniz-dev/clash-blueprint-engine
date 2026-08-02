@@ -1,7 +1,6 @@
 import { useCallback, useState } from "react";
 import type { BuildingCatalog, BuildingDefinition, GameRules, VillageEditor } from "@clash/engine";
 import { ValidationEngine, type RuleSet, type ValidationReport } from "@clash/rules-engine";
-import { analyzeLayout, type DefenseScore } from "@clash/analyzer";
 import { recommendImprovements, type AiReport } from "@clash/ai";
 import type { VillageSnapshot } from "@clash/engine";
 import type { PushLog } from "./useLog";
@@ -13,9 +12,10 @@ export type AnalyzeAsync = (input: {
 }) => Promise<AiReport>;
 
 /**
- * On-demand read models — validation, defense analysis and AI recommendations —
- * stored in React state for the side panels. These are *queries*: they never
- * mutate the village. `reset` clears them (called when a new layout loads).
+ * On-demand read models — validation and AI recommendations — stored in React
+ * state for the side panels. These are *queries*: they never mutate the village.
+ * `reset` clears them (called when a new layout loads). (Defense scoring is now
+ * continuous — see `useLiveAnalysis` — so there is no on-demand analysis here.)
  */
 export function useQueries(
   editor: VillageEditor,
@@ -26,7 +26,6 @@ export function useQueries(
   pushLog: PushLog,
 ) {
   const [validation, setValidation] = useState<ValidationReport | null>(null);
-  const [analysis, setAnalysis] = useState<DefenseScore | null>(null);
   const [ai, setAi] = useState<AiReport | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
 
@@ -46,16 +45,9 @@ export function useQueries(
     pushLog("info", `Validation: ${report.errors} errors, ${report.warnings} warnings`);
   }, [editor, ruleSet, catalog, rules, pushLog]);
 
-  const runAnalysis = useCallback(() => {
-    const score = analyzeLayout(editor.village, catalog, rules);
-    setAnalysis(score);
-    pushLog("info", `Defense score ${score.overall} (grade ${score.grade})`);
-  }, [editor, catalog, rules, pushLog]);
-
   const runAi = useCallback(async () => {
     const applyReport = (report: AiReport): void => {
       setAi(report);
-      setAnalysis(report.defenseScore);
       pushLog("info", `AI: ${report.recommendations.length} recommendations`);
     };
 
@@ -85,18 +77,14 @@ export function useQueries(
 
   const reset = useCallback(() => {
     setValidation(null);
-    setAnalysis(null);
     setAi(null);
   }, []);
 
   return {
     validation,
-    analysis,
     ai,
     aiLoading,
-    setAnalysis,
     runValidation,
-    runAnalysis,
     runAi,
     reset,
   };

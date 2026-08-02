@@ -47,8 +47,8 @@ It owns a single `VillageEditor` and **composes focused hooks** (each in
 - **`useSelection`** tracks the entity-agnostic selection (buildings **and**
   walls) and splits it by kind for the command layer.
 - **`useClipboard`**, **`useReplay`**, **`useHelp`**, **`useDiscardGuard`** own
-  their slices; **`useQueries`** runs `runValidation` / `runAnalysis` / `runAi`
-  on demand into panel state; **`useKeyboardShortcuts`** dispatches from the
+  their slices; **`useQueries`** runs `runValidation` / `runAi` on demand into
+  panel state; **`useKeyboardShortcuts`** dispatches from the
   `shortcuts.ts` registry; **`usePersistence`** does versioned autosave/restore.
 - **Dispatches, never decides.** Every action calls a facade method and surfaces
   any `EngineError` to the log — no rules, geometry, or scoring in React.
