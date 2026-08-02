@@ -15,6 +15,8 @@ const DRAG_THRESHOLD = 4; // px; distinguishes a click from a pan
 // Live rule-feedback outline colors (error red / warning amber).
 const RULE_ERROR = "#e5484d";
 const RULE_WARNING = "#f5a524";
+// Analyzer weak-point color (violet) — a third cue, distinct from rule/selection.
+const WEAK_COLOR = "#a970ff";
 
 /** Distinct colours for the built-in troop roster (view-only). */
 const TROOP_COLORS: Record<string, string> = {
@@ -393,11 +395,13 @@ export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.El
           {scene.buildings.map((b) => {
             const selected = controller.selectedIds.includes(b.id);
             const destroyed = replayState?.destroyedBuildingIds.has(b.id) ?? false;
-            // Live rule feedback colours the building's own border; selection is a
-            // separate outer ring, so a selected building still shows its violation.
+            // Three coexisting cues on one building: (1) rule violation = its own
+            // solid border, (2) selection = an outer yellow ring, (3) analyzer weak
+            // point = an inset dashed violet ring.
             const severity = controller.liveValidation.severityById.get(b.id);
             const stroke =
               severity === "error" ? RULE_ERROR : severity === "warning" ? RULE_WARNING : "#263238";
+            const weak = controller.liveAnalysis.weakById.get(b.id);
             return (
               <Group key={b.id} opacity={destroyed ? 0.25 : 1}>
                 <Rect
@@ -411,6 +415,19 @@ export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.El
                   stroke={stroke}
                   strokeWidth={severity ? 3 : 1}
                 />
+                {weak && (
+                  <Rect
+                    x={b.bounds.x * TILE + 2}
+                    y={b.bounds.y * TILE + 2}
+                    width={b.bounds.width * TILE - 4}
+                    height={b.bounds.height * TILE - 4}
+                    cornerRadius={2}
+                    stroke={WEAK_COLOR}
+                    strokeWidth={weak === "critical" ? 2.5 : 1.5}
+                    dash={[4, 3]}
+                    listening={false}
+                  />
+                )}
                 {selected && (
                   <Rect
                     x={b.bounds.x * TILE - 2}
@@ -437,6 +454,33 @@ export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.El
                   listening={false}
                 />
               </Group>
+            );
+          })}
+
+          {/* Directional weak-side markers (violet bars on weak compass edges) */}
+          {[...controller.liveAnalysis.byArea.entries()].map(([area, sev]) => {
+            const barLen = Math.min(gridW, gridH) * 0.15;
+            const th = 4;
+            const rect =
+              area === "north"
+                ? { x: (gridW - barLen) / 2, y: 0, width: barLen, height: th }
+                : area === "south"
+                  ? { x: (gridW - barLen) / 2, y: gridH - th, width: barLen, height: th }
+                  : area === "east"
+                    ? { x: gridW - th, y: (gridH - barLen) / 2, width: th, height: barLen }
+                    : area === "west"
+                      ? { x: 0, y: (gridH - barLen) / 2, width: th, height: barLen }
+                      : null;
+            if (!rect) return null; // center / overall are panel-only
+            return (
+              <Rect
+                key={`weakarea-${area}`}
+                {...rect}
+                cornerRadius={2}
+                fill={WEAK_COLOR}
+                opacity={sev === "critical" ? 0.9 : 0.6}
+                listening={false}
+              />
             );
           })}
 
