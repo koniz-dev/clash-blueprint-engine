@@ -64,6 +64,45 @@ Extra keys are rejected (strict schema).
 `category`/`minTier` must be consistent with the manifest — the loader enforces
 this referential integrity and fails loudly otherwise.
 
+### Spatial / design rules (optional)
+
+A pack may declare an optional `spatial` array of pure geometric constraints.
+It is fully backward-compatible: packs without it parse unchanged (`spatial`
+defaults to `[]`). Each entry is discriminated by `type`, selects buildings by
+`{ "id": … }` or `{ "category": … }`, and carries an optional `severity`
+(`error` | `warning` | `suggestion`) with a graded default. Distances are
+measured **center-to-center** over footprint bounding boxes, in tiles, using the
+entry's `metric` (`chebyshev` — king moves, the default — `manhattan`, or
+`euclidean`).
+
+```json
+"spatial": [
+  { "type": "centered", "target": { "id": "town_hall" }, "tolerance": 8 },
+  { "type": "minSpacing", "target": { "id": "air_defense" }, "minDistance": 8 },
+  { "type": "edgeBuffer", "buffer": 2 },
+  {
+    "type": "proximity",
+    "target": { "id": "clan_castle" },
+    "near": { "id": "town_hall" },
+    "maxDistance": 12
+  }
+]
+```
+
+| Type         | Params                       | Fires when                                                        | Default severity |
+| ------------ | ---------------------------- | ----------------------------------------------------------------- | ---------------- |
+| `minSpacing` | `target`, `minDistance`      | Two targets are closer than `minDistance` (both are subjects).    | warning          |
+| `edgeBuffer` | `buffer`, optional `target`  | A footprint sits within `buffer` tiles of any grid edge.          | warning          |
+| `centered`   | `target`, `tolerance`        | A target is more than `tolerance` tiles (Chebyshev) from centre.  | suggestion       |
+| `proximity`  | `target`, `near`, `maxDistance` | A target has no `near` building within `maxDistance`.          | warning          |
+
+Every finding carries `subjects` (the offending building ids), so violations
+light up in the editor's live validation with no UI wiring. Constraints are
+inert on packs that declare none. `enclosed` (a target must sit inside a walled
+compartment) is intentionally deferred — it needs flood-fill, which would pull
+`@clash/analyzer` into the pure engine; a shared enclosure helper is the planned
+home for it.
+
 ## Loading (Node)
 
 ```ts
@@ -106,6 +145,14 @@ Each issue carries a stable `code`, a `severity`, a human `message`, and the
 | `building-count`      | error              | A type over its `maxCount`.                           |
 | `tier-requirement`    | warning            | A building whose `minTier` exceeds the current tier.  |
 | `wall-limit`          | error / suggestion | Over the wall limit; or zero walls (suggestion).      |
+| `spatial-min-spacing` | data-driven        | Targets closer than the declared `minDistance`.       |
+| `spatial-edge-buffer` | data-driven        | A building inside the grid-edge buffer band.          |
+| `spatial-centered`    | data-driven        | A target too far from the grid centre.                |
+| `spatial-proximity`   | data-driven        | A target with no required neighbour in range.         |
+
+The four `spatial-*` rules are appended by `createDefaultRules` and read their
+constraints from the pack's `spatial` array (see [Spatial / design
+rules](#spatial--design-rules-optional)); their severity comes from the data.
 
 Messages use the game's tier label (e.g. "Town Hall", "Keep Level"), supplied
 via `GameRules`; pass it as the 4th argument to `ValidationEngine.validate`.

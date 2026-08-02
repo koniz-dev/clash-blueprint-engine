@@ -61,6 +61,25 @@ test.describe("Editor smoke", () => {
     await expect(page.getByText(/Too many Cannon/)).toBeVisible();
   });
 
+  test("surfaces a live spatial-design warning when a core is placed off-centre", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await page
+      .getByRole("button", { name: /Town Hall/ })
+      .first()
+      .click();
+
+    const surface = page.locator(".cbe-canvas");
+    await expect(surface).toBeVisible();
+
+    // Place the Town Hall in a corner — far from the grid centre. The tier-8
+    // pack's data-driven `centered` spatial rule fires live (no Validate press).
+    await surface.click({ position: { x: 60, y: 60 }, force: true });
+
+    await expect(page.getByText(/within 8 tiles of the grid center/)).toBeVisible();
+  });
+
   test("shows a live defense score as buildings are placed", async ({ page }) => {
     await page.goto("/");
     await page

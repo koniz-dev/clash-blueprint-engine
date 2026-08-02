@@ -86,6 +86,28 @@ describe("second game pack: Keep Siege (zero engine code)", () => {
     expect(report.isValid).toBe(true);
   });
 
+  it("fires data-driven spatial rules (off-center keep, turrets too close) with subjects", () => {
+    if (!loaded.ok) throw new Error("pack failed to load");
+    const level3 = loaded.value.ruleSets.get(3);
+    if (!level3) throw new Error("level-3 rules missing");
+    const editor = VillageEditor.forGridSize(40, loaded.value.catalog, 3);
+    editor.addBuilding("keep", { x: 0, y: 0 }); // corner → off-center + near edge
+    editor.addBuilding("turret", { x: 10, y: 10 });
+    editor.addBuilding("turret", { x: 12, y: 10 }); // centers 2 apart < 5 → too close
+    const report = new ValidationEngine().validate(
+      editor.village,
+      level3,
+      loaded.value.catalog,
+      rules,
+    );
+    const codes = report.issues.map((i) => i.code);
+    expect(codes).toContain("OFF_CENTER");
+    expect(codes).toContain("TOO_CLOSE");
+    const tooClose = report.issues.find((i) => i.code === "TOO_CLOSE");
+    expect(tooClose?.severity).toBe("warning");
+    expect(tooClose?.subjects).toHaveLength(2);
+  });
+
   it("recognizes the data-defined core in analysis (no 'missing core' error)", () => {
     if (!loaded.ok) throw new Error("pack failed to load");
     const score = analyzeLayout(buildBase().village, loaded.value.catalog, rules);
