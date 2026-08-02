@@ -19,6 +19,7 @@ const RULE_WARNING = "#f5a524";
 const WEAK_COLOR = "#a970ff";
 // Defensive-overlay colors — subtle/ambient, distinct from the per-building cues.
 const COVERAGE_COLOR = "#46a758"; // green "defended area"
+const DEADZONE_COLOR = "#94a3b8"; // slate hatch "wasted space"
 
 /** `#rrggbb` + alpha → an `rgba(...)` string for translucent Konva fills. */
 function hexToRgba(hex: string, alpha: number): string {
@@ -644,6 +645,32 @@ export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.El
             />
           ))}
         </Layer>
+
+        {/* Dead-zone hatch — ambient markers ABOVE the buildings. */}
+        {overlayPrefs.deadZones && overlays.deadZoneTiles.length > 0 && (
+          <Layer listening={false}>
+            <Shape
+              listening={false}
+              sceneFunc={(ctx) => {
+                ctx.fillStyle = hexToRgba(DEADZONE_COLOR, 0.18);
+                ctx.strokeStyle = hexToRgba(DEADZONE_COLOR, 0.6);
+                ctx.lineWidth = 1;
+                for (const t of overlays.deadZoneTiles) {
+                  const x = t.x * TILE;
+                  const y = t.y * TILE;
+                  ctx.fillRect(x, y, TILE, TILE);
+                  // Cross-hatch so dead zones read distinctly from the solid fills.
+                  ctx.beginPath();
+                  ctx.moveTo(x, y + TILE);
+                  ctx.lineTo(x + TILE, y);
+                  ctx.moveTo(x, y);
+                  ctx.lineTo(x + TILE, y + TILE);
+                  ctx.stroke();
+                }
+              }}
+            />
+          </Layer>
+        )}
       </Stage>
       <MiniMap scene={scene} onJump={jumpTo} />
       <div className="cbe-zoom-badge">{Math.round(scale * 100)}%</div>
