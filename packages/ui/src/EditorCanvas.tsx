@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Stage, Layer, Rect, Line, Text, Group, Circle } from "react-konva";
+import { Stage, Layer, Rect, Line, Text, Group, Circle, Shape } from "react-konva";
 import type Konva from "konva";
 import type { KonvaEventObject } from "konva/lib/Node";
 import { computeFootprint, type BuildingCatalog } from "@clash/engine";
@@ -17,6 +17,17 @@ const RULE_ERROR = "#e5484d";
 const RULE_WARNING = "#f5a524";
 // Analyzer weak-point color (violet) — a third cue, distinct from rule/selection.
 const WEAK_COLOR = "#a970ff";
+// Defensive-overlay colors — subtle/ambient, distinct from the per-building cues.
+const COVERAGE_COLOR = "#46a758"; // green "defended area"
+
+/** `#rrggbb` + alpha → an `rgba(...)` string for translucent Konva fills. */
+function hexToRgba(hex: string, alpha: number): string {
+  const h = hex.replace("#", "");
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
 
 /** Distinct colours for the built-in troop roster (view-only). */
 const TROOP_COLORS: Record<string, string> = {
@@ -120,6 +131,8 @@ export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.El
   }, []);
 
   const { scene, tool } = controller;
+  const { overlays } = controller;
+  const overlayPrefs = controller.overlayPrefs.prefs;
   const gridW = scene.grid.width * TILE;
   const gridH = scene.grid.height * TILE;
 
@@ -337,7 +350,13 @@ export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.El
   // the Figma-style panning affordance.
   const panning = tool === "hand" || (tool === "select" && spaceHeld);
   return (
-    <div ref={ref} className={`cbe-canvas${panning ? " cbe-canvas-pan" : ""}`}>
+    <div
+      ref={ref}
+      className={`cbe-canvas${panning ? " cbe-canvas-pan" : ""}`}
+      data-overlay-coverage={overlayPrefs.coverage ? "on" : undefined}
+      data-overlay-compartments={overlayPrefs.compartments ? "on" : undefined}
+      data-overlay-deadzones={overlayPrefs.deadZones ? "on" : undefined}
+    >
       <Stage
         ref={stageRef}
         width={size.width}
@@ -379,6 +398,21 @@ export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.El
               strokeWidth={1}
             />
           ))}
+        </Layer>
+
+        {/* Defensive overlays — translucent fills BELOW the buildings. */}
+        <Layer listening={false}>
+          {overlayPrefs.coverage && overlays.coverageTiles.length > 0 && (
+            <Shape
+              listening={false}
+              sceneFunc={(ctx) => {
+                ctx.fillStyle = hexToRgba(COVERAGE_COLOR, 0.16);
+                for (const t of overlays.coverageTiles) {
+                  ctx.fillRect(t.x * TILE, t.y * TILE, TILE, TILE);
+                }
+              }}
+            />
+          )}
         </Layer>
 
         <Layer>
