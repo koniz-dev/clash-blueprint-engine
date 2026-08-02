@@ -402,6 +402,19 @@ export function EditorCanvas({ controller, catalog }: EditorCanvasProps): JSX.El
 
         {/* Defensive overlays — translucent fills BELOW the buildings. */}
         <Layer listening={false}>
+          {overlayPrefs.compartments && overlays.compartments.length > 0 && (
+            <Shape
+              listening={false}
+              sceneFunc={(ctx) => {
+                for (const c of overlays.compartments) {
+                  ctx.fillStyle = hexToRgba(c.color, 0.16);
+                  for (const t of c.tiles) {
+                    ctx.fillRect(t.x * TILE, t.y * TILE, TILE, TILE);
+                  }
+                }
+              }}
+            />
+          )}
           {overlayPrefs.coverage && overlays.coverageTiles.length > 0 && (
             <Shape
               listening={false}
