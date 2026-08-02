@@ -30,5 +30,11 @@
     { "id": "air_bomb", "maxCount": 5 },
     { "id": "giant_bomb", "maxCount": 3 },
     { "id": "seeking_air_mine", "maxCount": 3 }
+  ],
+  "spatial": [
+    { "type": "centered", "target": { "id": "town_hall" }, "tolerance": 8 },
+    { "type": "minSpacing", "target": { "id": "air_defense" }, "minDistance": 8 },
+    { "type": "minSpacing", "target": { "id": "x_bow" }, "minDistance": 6 },
+    { "type": "edgeBuffer", "buffer": 2 }
   ]
 }

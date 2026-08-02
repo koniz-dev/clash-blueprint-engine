@@ -30,5 +30,17 @@
     { "id": "air_bomb", "maxCount": 6 },
     { "id": "giant_bomb", "maxCount": 4 },
     { "id": "seeking_air_mine", "maxCount": 4 }
+  ],
+  "spatial": [
+    { "type": "centered", "target": { "id": "town_hall" }, "tolerance": 8 },
+    { "type": "minSpacing", "target": { "id": "air_defense" }, "minDistance": 8 },
+    { "type": "minSpacing", "target": { "id": "x_bow" }, "minDistance": 6 },
+    { "type": "edgeBuffer", "buffer": 2 },
+    {
+      "type": "proximity",
+      "target": { "id": "clan_castle" },
+      "near": { "id": "town_hall" },
+      "maxDistance": 12
+    }
   ]
 }

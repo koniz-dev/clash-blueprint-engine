@@ -7,5 +7,15 @@
     { "id": "keep", "maxCount": 1 },
     { "id": "turret", "maxCount": 3 },
     { "id": "gold_vault", "maxCount": 2 }
+  ],
+  "spatial": [
+    { "type": "centered", "target": { "id": "keep" }, "tolerance": 6 },
+    { "type": "minSpacing", "target": { "id": "turret" }, "minDistance": 5 },
+    {
+      "type": "proximity",
+      "target": { "id": "gold_vault" },
+      "near": { "id": "keep" },
+      "maxDistance": 10
+    }
   ]
 }

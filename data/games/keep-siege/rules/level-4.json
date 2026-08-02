@@ -10,5 +10,16 @@
     { "id": "gold_vault", "maxCount": 4 },
     { "id": "barracks", "maxCount": 3 },
     { "id": "spike_snare", "maxCount": 6 }
+  ],
+  "spatial": [
+    { "type": "centered", "target": { "id": "keep" }, "tolerance": 6 },
+    { "type": "minSpacing", "target": { "category": "turret" }, "minDistance": 5 },
+    { "type": "edgeBuffer", "buffer": 2 },
+    {
+      "type": "proximity",
+      "target": { "id": "gold_vault" },
+      "near": { "id": "keep" },
+      "maxDistance": 10
+    }
   ]
 }
