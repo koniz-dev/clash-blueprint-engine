@@ -47,6 +47,64 @@ export const requiredBuildingSchema = z
   })
   .strict();
 
+// --- Spatial / design rules (optional, data-driven geometric constraints) ---
+
+/** Select the buildings a spatial rule applies to — by definition id or category. */
+const targetSelectorSchema = z.union([
+  z.object({ id: z.string().min(1) }).strict(),
+  z.object({ category: categorySchema }).strict(),
+]);
+
+/** How center-to-center tile distance is measured. `chebyshev` = king moves. */
+const metricSchema = z.enum(["chebyshev", "manhattan", "euclidean"]);
+
+const severitySchema = z.enum(["error", "warning", "suggestion"]);
+
+/**
+ * A single geometric constraint, discriminated by `type`. Each entry is pure
+ * data; the validation engine turns it into layout findings with `subjects` so
+ * offending buildings light up in the editor. Severity defaults are graded by
+ * how hard the constraint usually is (spacing/edge/proximity warn, centering
+ * suggests) and can always be overridden per entry.
+ */
+export const spatialRuleSchema = z.discriminatedUnion("type", [
+  z
+    .object({
+      type: z.literal("minSpacing"),
+      target: targetSelectorSchema,
+      minDistance: positiveInt,
+      metric: metricSchema.default("chebyshev"),
+      severity: severitySchema.default("warning"),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal("edgeBuffer"),
+      target: targetSelectorSchema.optional(),
+      buffer: positiveInt,
+      severity: severitySchema.default("warning"),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal("centered"),
+      target: targetSelectorSchema,
+      tolerance: positiveInt,
+      severity: severitySchema.default("suggestion"),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal("proximity"),
+      target: targetSelectorSchema,
+      near: targetSelectorSchema,
+      maxDistance: positiveInt,
+      metric: metricSchema.default("chebyshev"),
+      severity: severitySchema.default("warning"),
+    })
+    .strict(),
+]);
+
 export const rulePackSchema = z
   .object({
     tier: z.number().int().positive(),
@@ -54,11 +112,17 @@ export const rulePackSchema = z
     walls: z.number().int().nonnegative(),
     buildings: z.array(buildingAllowanceSchema),
     required: z.array(requiredBuildingSchema).default([]),
+    spatial: z.array(spatialRuleSchema).default([]),
   })
   .strict();
 
 export type BuildingDefinitionJson = z.infer<typeof buildingDefinitionSchema>;
 export type RulePackJson = z.infer<typeof rulePackSchema>;
+/** A parsed spatial constraint (discriminated on `type`). */
+export type SpatialRuleJson = z.infer<typeof spatialRuleSchema>;
+/** Selects buildings for a spatial rule, by definition id or category. */
+export type TargetSelector = z.infer<typeof targetSelectorSchema>;
+export type DistanceMetric = z.infer<typeof metricSchema>;
 
 /**
  * Normalize a parsed record into a `BuildingDefinition`. Optional keys are

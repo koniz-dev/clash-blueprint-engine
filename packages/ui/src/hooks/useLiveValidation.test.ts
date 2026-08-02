@@ -19,6 +19,7 @@ function ruleSet(
       Object.entries(allowances).map(([id, maxCount]) => [id, { definitionId: id, maxCount }]),
     ),
     required,
+    spatial: [],
   };
 }
 

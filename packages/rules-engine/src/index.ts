@@ -2,11 +2,15 @@
 export {
   buildingDefinitionSchema,
   rulePackSchema,
+  spatialRuleSchema,
   parseBuildingDefinition,
   parseBuildingDefinitions,
   parseRulePack,
   type BuildingDefinitionJson,
   type RulePackJson,
+  type SpatialRuleJson,
+  type TargetSelector,
+  type DistanceMetric,
   type ParseError,
 } from "./schema.js";
 
@@ -17,6 +21,7 @@ export {
   type RuleSet,
   type BuildingAllowance,
   type RequiredBuilding,
+  type SpatialRule,
 } from "./rule-set.js";
 
 // --- Game definition (the game-agnostic abstraction) ---

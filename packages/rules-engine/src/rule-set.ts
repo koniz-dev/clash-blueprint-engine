@@ -3,7 +3,10 @@ import {
   type BuildingCatalog,
   type BuildingDefinition,
 } from "@clash/engine";
-import type { RulePackJson } from "./schema.js";
+import type { RulePackJson, SpatialRuleJson } from "./schema.js";
+
+/** A geometric constraint carried on the rule set (see {@link SpatialRuleJson}). */
+export type SpatialRule = SpatialRuleJson;
 
 /** Max allowed count of a building type at a given Town Hall level. */
 export interface BuildingAllowance {
@@ -28,6 +31,8 @@ export interface RuleSet {
   readonly wallLimit: number;
   readonly allowances: ReadonlyMap<string, BuildingAllowance>;
   readonly required: ReadonlyArray<RequiredBuilding>;
+  /** Optional geometric constraints; empty for packs that declare none. */
+  readonly spatial: ReadonlyArray<SpatialRule>;
 }
 
 export function buildRuleSet(pack: RulePackJson): RuleSet {
@@ -46,6 +51,7 @@ export function buildRuleSet(pack: RulePackJson): RuleSet {
     wallLimit: pack.walls,
     allowances,
     required,
+    spatial: pack.spatial,
   };
 }
 
