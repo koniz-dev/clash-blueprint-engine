@@ -53,3 +53,10 @@ export {
   wallLimitRule,
   coordinateValidityRule,
 } from "./validation/rules.js";
+export {
+  spatialRules,
+  spatialMinSpacingRule,
+  spatialEdgeBufferRule,
+  spatialCenteredRule,
+  spatialProximityRule,
+} from "./validation/spatial-rules.js";

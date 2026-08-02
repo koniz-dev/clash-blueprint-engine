@@ -1,4 +1,5 @@
 import type { BuildingInstance } from "@clash/engine";
+import { spatialRules } from "./spatial-rules.js";
 import type { ValidationContext, ValidationIssue, ValidationRule } from "./types.js";
 
 /** Group placed buildings by their definition id. */
@@ -164,7 +165,10 @@ export const coordinateValidityRule: ValidationRule = {
   },
 };
 
-/** The default rule set, ordered most-severe concern first. */
+/**
+ * The default rule set, ordered most-severe concern first. Spatial rules are
+ * appended and stay inert unless the pack declares `spatial` constraints.
+ */
 export function createDefaultRules(): ValidationRule[] {
   return [
     coordinateValidityRule,
@@ -173,5 +177,6 @@ export function createDefaultRules(): ValidationRule[] {
     buildingCountRule,
     tierRequirementRule,
     wallLimitRule,
+    ...spatialRules(),
   ];
 }
