@@ -24,7 +24,7 @@ apps/web (Next.js, client shell)
 
 @clash/ui (React binding + components)
   useEditor.ts        THE binding — owns one VillageEditor and composes the hooks below
-  hooks/              focused hooks: useSelection, useClipboard, useQueries, useLiveValidation,
+  hooks/              focused hooks: useSelection, useClipboard, useQueries, useLiveValidation, useLiveAnalysis,
                       useReplay, useKeyboardShortcuts, usePersistence, useHelp, useDiscardGuard, useEngineBinding, useLog
   EditorCanvas.tsx    Konva view over controller.scene; turns pointer input into controller actions
   Toolbar / BuildingLibrary / Panels   presentational, read controller state, call controller actions
@@ -141,6 +141,31 @@ Four surfaces consume it, all **advisory** (placement is never blocked):
 Suggestions stay panel-only (never inline, to avoid clutter). The toolbar
 **Validate** button keeps only its distinct job: `validateAndRecord`, stamping a
 `LayoutValidated` **checkpoint** on the timeline.
+
+## Live defense score
+
+Defensive quality is **continuous** too, mirroring the rule feedback exactly.
+`useLiveAnalysis` (in `hooks/`) runs the **pure** `analyzeLayout` — no side
+effects — keyed off the `version` counter and **debounced ~200ms** (longer than
+validation's 80ms, since analyze evaluates every metric plus a compartment
+flood-fill; the longer window lets the Wall tool's per-tile burst settle into one
+pass, staying smooth on a full 44×44 base). It derives `liveAnalysis` on the
+controller: the `DefenseScore`, a per-building `weakById` map (critical/weak;
+analyzer "info" stays panel-only), and a per-area `byArea` summary. An **empty
+village yields no score** (nothing to grade yet).
+
+- The **Defense Score panel** updates in real time — overall, grade, and metric
+  bars re-render as you edit — and lists the **weak points** (severity badge +
+  the analyzer's message + a localized area chip).
+- On the **canvas**, weak buildings get a **third, distinct cue**: an inset
+  **dashed violet ring** (thicker for `critical`), kept visually separate from the
+  solid red/amber **rule** border and the outer yellow **selection** ring — so a
+  building can show all three at once. Weak compass sides get a short violet edge
+  bar (`byArea`); center/overall stay panel-only.
+
+Because the score is live, the old **Analyze** button was removed — it had no
+unique side effect (unlike Validate's checkpoint event), and **AI Suggest**
+already runs the heavier attack-simulation pass.
 
 ## 3D view
 

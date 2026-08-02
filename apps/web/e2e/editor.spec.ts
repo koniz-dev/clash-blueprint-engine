@@ -73,6 +73,29 @@ test.describe("Editor smoke", () => {
     await expect(page.getByText("/100").first()).toBeVisible();
   });
 
+  test("surfaces live analyzer weak points as buildings are placed (no Analyze press)", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    // A core plus a far-flung storage → a sparse base the analyzer flags.
+    await page
+      .getByRole("button", { name: /Town Hall/ })
+      .first()
+      .click();
+    const surface = page.locator(".cbe-canvas");
+    await surface.click({ position: { x: 300, y: 300 }, force: true });
+    await page
+      .getByRole("button", { name: /Gold Storage/ })
+      .first()
+      .click();
+    await surface.click({ position: { x: 60, y: 60 }, force: true });
+
+    // The live grade renders…
+    await expect(page.locator(".cbe-grade").first()).toBeVisible();
+    // …and the panel lists analyzer weak points — WITHOUT pressing Analyze.
+    await expect(page.locator(".cbe-weakpoints .cbe-issue").first()).toBeVisible();
+  });
+
   test("drags a placed building to move it as one undoable command", async ({ page }) => {
     await page.goto("/");
 
