@@ -29,6 +29,7 @@ import { useSelection } from "./hooks/useSelection";
 import { useClipboard } from "./hooks/useClipboard";
 import { useQueries, type AnalyzeAsync } from "./hooks/useQueries";
 import { useLiveValidation } from "./hooks/useLiveValidation";
+import { useLiveAnalysis } from "./hooks/useLiveAnalysis";
 import { useReplay } from "./hooks/useReplay";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { usePersistence } from "./hooks/usePersistence";
@@ -114,6 +115,8 @@ export function useEditor(options: UseEditorOptions) {
   const queries = useQueries(editor, catalog, rules, ruleSet, analyzeAsync, pushLog);
   // Reactive rule feedback derived from the pure validator on every change.
   const liveValidation = useLiveValidation(editor, catalog, rules, ruleSet, version);
+  // Reactive defense score derived from the pure analyzer (heavier → longer debounce).
+  const liveAnalysis = useLiveAnalysis(editor, catalog, rules, version);
   const replay = useReplay(editor, catalog, rules, pushLog);
   const help = useHelp(options.persistKey);
   const guard = useDiscardGuard(editor);
@@ -358,6 +361,8 @@ export function useEditor(options: UseEditorOptions) {
     validation: queries.validation,
     // Reactive rule feedback (report + per-building severity + per-definition status).
     liveValidation,
+    // Reactive defense score (score + per-building weak severity + per-area summary).
+    liveAnalysis,
     analysis: queries.analysis,
     ai: queries.ai,
     aiLoading: queries.aiLoading,
