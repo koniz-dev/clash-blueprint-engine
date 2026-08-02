@@ -30,6 +30,8 @@ import { useClipboard } from "./hooks/useClipboard";
 import { useQueries, type AnalyzeAsync } from "./hooks/useQueries";
 import { useLiveValidation } from "./hooks/useLiveValidation";
 import { useLiveAnalysis } from "./hooks/useLiveAnalysis";
+import { useOverlays } from "./hooks/useOverlays";
+import { useOverlayPrefs } from "./hooks/useOverlayPrefs";
 import { useReplay } from "./hooks/useReplay";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { usePersistence } from "./hooks/usePersistence";
@@ -117,6 +119,10 @@ export function useEditor(options: UseEditorOptions) {
   const liveValidation = useLiveValidation(editor, catalog, rules, ruleSet, version);
   // Reactive defense score derived from the pure analyzer (heavier → longer debounce).
   const liveAnalysis = useLiveAnalysis(editor, catalog, rules, version);
+  // Toggleable defensive overlays (coverage / compartments / dead zones), off by
+  // default; the derivation runs only while at least one overlay is active.
+  const overlayPrefs = useOverlayPrefs();
+  const overlays = useOverlays(editor, catalog, rules, version, overlayPrefs.active);
   const replay = useReplay(editor, catalog, rules, pushLog);
   const help = useHelp(options.persistKey);
   const guard = useDiscardGuard(editor);
@@ -363,6 +369,9 @@ export function useEditor(options: UseEditorOptions) {
     liveValidation,
     // Reactive defense score (score + per-building weak severity + per-area summary).
     liveAnalysis,
+    // Defensive overlays: renderable geometry + toggle prefs (coverage/compartments/dead zones).
+    overlays,
+    overlayPrefs,
     ai: queries.ai,
     aiLoading: queries.aiLoading,
     canUndo: editor.history.canUndo,
