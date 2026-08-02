@@ -25,6 +25,12 @@ export const vi: Messages = {
   "view.2d": "2D",
   "view.3d": "3D",
 
+  "overlays.button": "Lớp phủ",
+  "overlays.title": "Lớp phủ phòng thủ",
+  "overlays.coverage": "Tầm bao phủ",
+  "overlays.compartments": "Ngăn tường",
+  "overlays.deadZones": "Vùng chết",
+
   "tool.select": "Chọn",
   "tool.place": "Đặt",
   "tool.wall": "Tường",

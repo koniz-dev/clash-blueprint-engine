@@ -1,6 +1,7 @@
 import { useI18n, type MessageKey } from "./i18n";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { OpenMenu } from "./OpenMenu";
+import { OverlaysMenu } from "./OverlaysMenu";
 import { shortcutHint } from "./shortcuts";
 import type { EditorController, Tool } from "./useEditor";
 import { downloadDataUrl, downloadExport } from "./util";
@@ -72,6 +73,12 @@ export function Toolbar({ controller }: { controller: EditorController }): JSX.E
           {t("view.3d")}
         </button>
       </div>
+
+      {viewMode === "2d" && (
+        <div className="cbe-toolbar-group">
+          <OverlaysMenu controller={controller} />
+        </div>
+      )}
 
       <div className="cbe-toolbar-group">
         {TOOLS.map((tt) => (

@@ -24,6 +24,12 @@ export const en = {
   "view.2d": "2D",
   "view.3d": "3D",
 
+  "overlays.button": "Overlays",
+  "overlays.title": "Defensive overlays",
+  "overlays.coverage": "Coverage",
+  "overlays.compartments": "Compartments",
+  "overlays.deadZones": "Dead zones",
+
   "tool.select": "Select",
   "tool.place": "Place",
   "tool.wall": "Wall",
