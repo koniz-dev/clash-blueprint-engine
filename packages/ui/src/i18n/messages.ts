@@ -13,7 +13,6 @@ export const en = {
   "toolbar.undo": "Undo",
   "toolbar.redo": "Redo",
   "toolbar.validate": "Validate",
-  "toolbar.analyze": "Analyze",
   "toolbar.aiSuggest": "AI Suggest",
   "toolbar.aiAnalyzing": "Analyzing…",
   "toolbar.exportJson": "Export JSON",

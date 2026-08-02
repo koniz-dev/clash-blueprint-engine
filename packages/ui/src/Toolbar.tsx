@@ -96,9 +96,6 @@ export function Toolbar({ controller }: { controller: EditorController }): JSX.E
         >
           {t("toolbar.validate")}
         </button>
-        <button className="cbe-btn" onClick={actions.runAnalysis}>
-          {t("toolbar.analyze")}
-        </button>
         <button
           className="cbe-btn cbe-btn-accent"
           onClick={() => void actions.runAi()}

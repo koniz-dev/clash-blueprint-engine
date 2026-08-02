@@ -14,7 +14,6 @@ export const vi: Messages = {
   "toolbar.undo": "Hoàn tác",
   "toolbar.redo": "Làm lại",
   "toolbar.validate": "Kiểm tra",
-  "toolbar.analyze": "Phân tích",
   "toolbar.aiSuggest": "Gợi ý AI",
   "toolbar.aiAnalyzing": "Đang phân tích…",
   "toolbar.exportJson": "Xuất JSON",

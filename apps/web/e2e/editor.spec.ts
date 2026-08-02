@@ -61,14 +61,14 @@ test.describe("Editor smoke", () => {
     await expect(page.getByText(/Too many Cannon/)).toBeVisible();
   });
 
-  test("runs analysis and shows a defense score", async ({ page }) => {
+  test("shows a live defense score as buildings are placed", async ({ page }) => {
     await page.goto("/");
     await page
       .getByRole("button", { name: /Town Hall/ })
       .first()
       .click();
     await page.locator(".cbe-canvas").click({ position: { x: 300, y: 300 }, force: true });
-    await page.getByRole("button", { name: "Analyze" }).click();
+    // No "Analyze" press — the Defense Score panel updates live.
     await expect(page.getByRole("heading", { name: "Defense Score" })).toBeVisible();
     await expect(page.getByText("/100").first()).toBeVisible();
   });
@@ -150,9 +150,8 @@ test.describe("Editor smoke", () => {
 
     // Loading a snapshot replaces the layout (a fresh timeline opens).
     await expect(page.getByText(/Loaded Starter Base/).first()).toBeVisible();
-    // Analyze now scores the loaded base (it has buildings).
-    await page.getByRole("button", { name: "Analyze" }).click();
-    await expect(page.getByRole("heading", { name: "Defense Score" })).toBeVisible();
+    // The loaded base is scored live (it has buildings) — no Analyze press.
+    await expect(page.getByText("/100").first()).toBeVisible();
   });
 
   test("deploys troops and plays an attack replay", async ({ page }) => {
