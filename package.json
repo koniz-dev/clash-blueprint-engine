@@ -24,16 +24,16 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.14.0",
-    "eslint": "^10.8.0",
+    "eslint": "^10.8.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-hooks": "^7.1.1",
-    "globals": "^17.8.0",
+    "globals": "^17.10.0",
     "prettier": "^3.9.6",
     "tsup": "^8.3.0",
-    "turbo": "^2.10.7",
+    "turbo": "^2.10.9",
     "typedoc": "^0.28.0",
     "typescript": "^5.6.0",
-    "typescript-eslint": "^8.65.0",
+    "typescript-eslint": "^8.67.0",
     "vitest": "^4.1.10"
   }
 }
