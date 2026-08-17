@@ -3,33 +3,33 @@ import { EMPTY_SYMBOL, WALL_SYMBOL, categoryLabel, categorySymbol } from "./them
 
 function renderAscii(scene: Scene): string {
   const { width, height } = scene.grid;
-  const grid: string[][] = Array.from({ length: height }, () =>
-    Array.from({ length: width }, () => EMPTY_SYMBOL),
-  );
+  // Occupied cells keyed by `y * width + x`. A numeric Map key can't reach
+  // Object.prototype the way a computed property write from scene data could.
+  const occupied = new Map<number, string>();
+  const inBounds = (x: number, y: number): boolean =>
+    Number.isInteger(x) && Number.isInteger(y) && x >= 0 && x < width && y >= 0 && y < height;
 
   const present = new Set<string>();
   for (const building of scene.buildings) {
     const symbol = categorySymbol(building.category);
     present.add(building.category);
     for (const cell of building.cells) {
-      if (cell.y >= 0 && cell.y < height && cell.x >= 0 && cell.x < width) {
-        grid[cell.y]![cell.x] = symbol;
+      if (inBounds(cell.x, cell.y)) {
+        occupied.set(cell.y * width + cell.x, symbol);
       }
     }
   }
   for (const wall of scene.walls) {
-    if (
-      wall.position.y >= 0 &&
-      wall.position.y < height &&
-      wall.position.x >= 0 &&
-      wall.position.x < width
-    ) {
-      grid[wall.position.y]![wall.position.x] = WALL_SYMBOL;
+    const { x, y } = wall.position;
+    if (inBounds(x, y)) {
+      occupied.set(y * width + x, WALL_SYMBOL);
     }
   }
 
   const header = `${scene.tierLabel} ${scene.tier} · ${width}x${height} · ${scene.buildings.length} buildings · ${scene.walls.length} walls`;
-  const body = grid.map((row) => row.join("")).join("\n");
+  const body = Array.from({ length: height }, (_, y) =>
+    Array.from({ length: width }, (_, x) => occupied.get(y * width + x) ?? EMPTY_SYMBOL).join(""),
+  ).join("\n");
 
   const legendEntries = [...present]
     .sort()

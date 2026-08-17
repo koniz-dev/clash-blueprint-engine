@@ -15,6 +15,10 @@ type AiResponse = { report: AiReport } | { error: string };
 // Runs the AI recommendation (which simulates attacks from every side) off the
 // main thread, so the editor stays responsive while it computes.
 self.onmessage = (event: MessageEvent<AiRequest>) => {
+  // A dedicated worker should only ever hear from the page that spawned it:
+  // those events carry an empty origin, so anything else is not ours.
+  if (event.origin !== "" && event.origin !== self.origin) return;
+
   const post = (response: AiResponse): void => (self as unknown as Worker).postMessage(response);
 
   const { snapshot, definitions } = event.data;
