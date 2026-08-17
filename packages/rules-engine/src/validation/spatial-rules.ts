@@ -205,10 +205,5 @@ export const spatialProximityRule: ValidationRule = {
  * findings — the rules are inert on legacy packs.
  */
 export function spatialRules(): ValidationRule[] {
-  return [
-    spatialMinSpacingRule,
-    spatialEdgeBufferRule,
-    spatialCenteredRule,
-    spatialProximityRule,
-  ];
+  return [spatialMinSpacingRule, spatialEdgeBufferRule, spatialCenteredRule, spatialProximityRule];
 }

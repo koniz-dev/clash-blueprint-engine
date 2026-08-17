@@ -89,12 +89,12 @@ entry's `metric` (`chebyshev` — king moves, the default — `manhattan`, or
 ]
 ```
 
-| Type         | Params                       | Fires when                                                        | Default severity |
-| ------------ | ---------------------------- | ----------------------------------------------------------------- | ---------------- |
-| `minSpacing` | `target`, `minDistance`      | Two targets are closer than `minDistance` (both are subjects).    | warning          |
-| `edgeBuffer` | `buffer`, optional `target`  | A footprint sits within `buffer` tiles of any grid edge.          | warning          |
-| `centered`   | `target`, `tolerance`        | A target is more than `tolerance` tiles (Chebyshev) from centre.  | suggestion       |
-| `proximity`  | `target`, `near`, `maxDistance` | A target has no `near` building within `maxDistance`.          | warning          |
+| Type         | Params                          | Fires when                                                       | Default severity |
+| ------------ | ------------------------------- | ---------------------------------------------------------------- | ---------------- |
+| `minSpacing` | `target`, `minDistance`         | Two targets are closer than `minDistance` (both are subjects).   | warning          |
+| `edgeBuffer` | `buffer`, optional `target`     | A footprint sits within `buffer` tiles of any grid edge.         | warning          |
+| `centered`   | `target`, `tolerance`           | A target is more than `tolerance` tiles (Chebyshev) from centre. | suggestion       |
+| `proximity`  | `target`, `near`, `maxDistance` | A target has no `near` building within `maxDistance`.            | warning          |
 
 Every finding carries `subjects` (the offending building ids), so violations
 light up in the editor's live validation with no UI wiring. Constraints are
