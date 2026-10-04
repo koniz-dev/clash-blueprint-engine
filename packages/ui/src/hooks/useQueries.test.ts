@@ -16,7 +16,15 @@ describe("useQueries", () => {
   it("logs when validation runs without a rule set", () => {
     const pushLog = vi.fn();
     const { result } = renderHook(() =>
-      useQueries(editorWithBase(), storyCatalog, DEFAULT_GAME_RULES, undefined, undefined, pushLog),
+      useQueries(
+        editorWithBase(),
+        storyCatalog,
+        DEFAULT_GAME_RULES,
+        undefined,
+        0,
+        undefined,
+        pushLog,
+      ),
     );
     act(() => result.current.runValidation());
     expect(pushLog).toHaveBeenCalledWith("info", "No rule set loaded");
@@ -31,6 +39,7 @@ describe("useQueries", () => {
         storyCatalog,
         DEFAULT_GAME_RULES,
         storyRuleSet,
+        0,
         undefined,
         pushLog,
       ),
@@ -48,6 +57,7 @@ describe("useQueries", () => {
         storyCatalog,
         DEFAULT_GAME_RULES,
         storyRuleSet,
+        0,
         undefined,
         pushLog,
       ),
@@ -73,6 +83,7 @@ describe("useQueries", () => {
         storyCatalog,
         DEFAULT_GAME_RULES,
         storyRuleSet,
+        0,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         analyzeAsync as any,
         pushLog,
@@ -84,5 +95,41 @@ describe("useQueries", () => {
     });
     expect(analyzeAsync).toHaveBeenCalledTimes(1);
     expect(result.current.ai).toBe(report);
+  });
+
+  it("discards an async AI report when the layout version changes", async () => {
+    const pushLog = vi.fn();
+    const report = { recommendations: [], defenseScore: { overall: 50, grade: "C" } };
+    let resolveAnalysis!: (value: typeof report) => void;
+    const analyzeAsync = vi.fn(
+      () =>
+        new Promise<typeof report>((resolve) => {
+          resolveAnalysis = resolve;
+        }),
+    );
+    const editor = editorWithBase();
+    const { result, rerender } = renderHook(
+      ({ version }) =>
+        useQueries(
+          editor,
+          storyCatalog,
+          DEFAULT_GAME_RULES,
+          storyRuleSet,
+          version,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          analyzeAsync as any,
+          pushLog,
+        ),
+      { initialProps: { version: 0 } },
+    );
+
+    act(() => {
+      void result.current.runAi();
+    });
+    rerender({ version: 1 });
+    await act(async () => resolveAnalysis(report));
+
+    expect(result.current.ai).toBeNull();
+    expect(pushLog).not.toHaveBeenCalledWith("info", "AI: 0 recommendations");
   });
 });

@@ -114,7 +114,7 @@ export function useEditor(options: UseEditorOptions) {
   const selection = useSelection(editor, scene);
   const { selectedIds, selectedId, setSelectedIds, partitionSelection } = selection;
   const clipboard = useClipboard(editor, selectedIds, setSelectedIds, pushLog);
-  const queries = useQueries(editor, catalog, rules, ruleSet, analyzeAsync, pushLog);
+  const queries = useQueries(editor, catalog, rules, ruleSet, version, analyzeAsync, pushLog);
   // Reactive rule feedback derived from the pure validator on every change.
   const liveValidation = useLiveValidation(editor, catalog, rules, ruleSet, version);
   // Reactive defense score derived from the pure analyzer (heavier → longer debounce).

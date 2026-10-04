@@ -100,6 +100,29 @@ describe("VillageEditor event log as a replayable timeline", () => {
 });
 
 describe("VillageEditor batch operations", () => {
+  it("moves adjacent buildings through their old cells as one final layout", () => {
+    const editor = makeEditor();
+    const a = editor.addBuilding("cannon", { x: 10, y: 10 });
+    const b = editor.addBuilding("cannon", { x: 13, y: 10 });
+    const idA = a.ok ? a.value : undefined;
+    const idB = b.ok ? b.value : undefined;
+
+    const moved = editor.moveBuildings([
+      { id: idA!, to: { x: 11, y: 10 } },
+      { id: idB!, to: { x: 14, y: 10 } },
+    ]);
+
+    expect(moved.ok).toBe(true);
+    expect(editor.village.getBuilding(idA!)?.position).toEqual({ x: 11, y: 10 });
+    expect(editor.village.getBuilding(idB!)?.position).toEqual({ x: 14, y: 10 });
+    editor.undo();
+    expect(editor.village.getBuilding(idA!)?.position).toEqual({ x: 10, y: 10 });
+    expect(editor.village.getBuilding(idB!)?.position).toEqual({ x: 13, y: 10 });
+    editor.redo();
+    expect(editor.village.getBuilding(idA!)?.position).toEqual({ x: 11, y: 10 });
+    expect(editor.village.getBuilding(idB!)?.position).toEqual({ x: 14, y: 10 });
+  });
+
   it("moves several buildings as a single undoable gesture", () => {
     const editor = makeEditor();
     const a = editor.addBuilding("cannon", { x: 10, y: 10 });
@@ -251,5 +274,19 @@ describe("VillageEditor persistence", () => {
     expect(fresh.events.all().map((e) => e.event.type)).toEqual(["LayoutLoaded"]);
     // Loading resets history.
     expect(fresh.history.canUndo).toBe(false);
+  });
+
+  it("skips ids already present in a loaded snapshot", () => {
+    const original = makeEditor();
+    const first = original.addBuilding("cannon", { x: 10, y: 10 });
+    expect(first.ok && first.value).toBe("t_1");
+
+    const restored = makeEditor();
+    expect(restored.load(original.toSnapshot()).ok).toBe(true);
+    const added = restored.addBuilding("cannon", { x: 20, y: 20 });
+
+    expect(added.ok).toBe(true);
+    if (added.ok) expect(added.value).toBe("t_2");
+    expect(restored.village.buildingCount).toBe(2);
   });
 });

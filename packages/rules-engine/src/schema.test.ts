@@ -63,6 +63,40 @@ describe("parseBuildingDefinition", () => {
     });
     expect(result.ok).toBe(false);
   });
+
+  it("rejects custom hitbox cells outside the declared footprint", () => {
+    const result = parseBuildingDefinition({
+      id: "x",
+      name: "X",
+      category: "defense",
+      width: 2,
+      height: 2,
+      hitbox: [
+        [0, 0],
+        [2, 1],
+      ],
+      minTier: 1,
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.issues.join()).toMatch(/inside 2x2 bounds/);
+  });
+
+  it("rejects duplicate custom hitbox cells", () => {
+    const result = parseBuildingDefinition({
+      id: "x",
+      name: "X",
+      category: "defense",
+      width: 2,
+      height: 2,
+      hitbox: [
+        [0, 0],
+        [0, 0],
+      ],
+      minTier: 1,
+    });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.issues.join()).toMatch(/duplicate cell/);
+  });
 });
 
 describe("parseRulePack", () => {

@@ -10,6 +10,7 @@ import type { WallId } from "../domain/wall.js";
 import { AddBuildingCommand } from "./commands/add-building.js";
 import { AddWallCommand } from "./commands/add-wall.js";
 import { MacroCommand } from "./commands/macro.js";
+import { MoveEntitiesCommand } from "./commands/move-entities.js";
 import { MoveBuildingCommand } from "./commands/move-building.js";
 import { MoveWallCommand } from "./commands/move-wall.js";
 import { RemoveBuildingCommand } from "./commands/remove-building.js";
@@ -86,10 +87,9 @@ export class VillageEditor {
    * failure rolls the whole thing back. An empty list is a successful no-op.
    */
   moveBuildings(moves: readonly { id: BuildingId; to: GridVec }[]): Result<void, EngineError> {
-    return this.#runBatch(
-      "Move buildings",
-      moves.map((m) => new MoveBuildingCommand({ id: m.id, to: m.to })),
-    );
+    if (moves.length === 0) return ok(undefined);
+    if (moves.length === 1) return this.moveBuilding(moves[0]!.id, moves[0]!.to);
+    return this.#history.execute(new MoveEntitiesCommand("Move buildings", moves, []));
   }
 
   moveWall(id: WallId, to: GridVec): Result<void, EngineError> {
@@ -143,10 +143,16 @@ export class VillageEditor {
     buildingMoves: readonly { id: BuildingId; to: GridVec }[],
     wallMoves: readonly { id: WallId; to: GridVec }[],
   ): Result<void, EngineError> {
-    return this.#runBatch("Move selection", [
-      ...buildingMoves.map((m) => new MoveBuildingCommand({ id: m.id, to: m.to })),
-      ...wallMoves.map((m) => new MoveWallCommand({ id: m.id, to: m.to })),
-    ]);
+    if (buildingMoves.length + wallMoves.length === 0) return ok(undefined);
+    if (buildingMoves.length === 1 && wallMoves.length === 0) {
+      return this.moveBuilding(buildingMoves[0]!.id, buildingMoves[0]!.to);
+    }
+    if (wallMoves.length === 1 && buildingMoves.length === 0) {
+      return this.moveWall(wallMoves[0]!.id, wallMoves[0]!.to);
+    }
+    return this.#history.execute(
+      new MoveEntitiesCommand("Move selection", buildingMoves, wallMoves),
+    );
   }
 
   /** Run a list of commands as a single history entry (macro when >1). */

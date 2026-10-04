@@ -1,5 +1,5 @@
 import type { GridVec, Result } from "@clash/shared";
-import { invariant, ok } from "@clash/shared";
+import { err, invariant, ok } from "@clash/shared";
 import type { BuildingId, BuildingInstance } from "../../domain/building.js";
 import type { EngineError } from "../../domain/errors.js";
 import type { Rotation } from "../../domain/rotation.js";
@@ -29,19 +29,33 @@ export class AddBuildingCommand implements Command {
   }
 
   execute(ctx: CommandContext): Result<void, EngineError> {
-    const instance: BuildingInstance = this.#instance ?? {
-      id: brand<"Building">(ctx.ids.next()),
-      definitionId: this.#params.definitionId,
-      position: this.#params.position,
-      rotation: this.#params.rotation ?? 0,
-    };
+    if (this.#instance) {
+      const placed = ctx.village.placeBuilding(this.#instance);
+      if (!placed.ok) return placed;
+      ctx.events.append({ type: "BuildingPlaced", building: this.#instance });
+      return ok(undefined);
+    }
 
-    const placed = ctx.village.placeBuilding(instance);
-    if (!placed.ok) return placed;
-
-    this.#instance = instance;
-    ctx.events.append({ type: "BuildingPlaced", building: instance });
-    return ok(undefined);
+    // A restored snapshot may already contain ids emitted by a fresh
+    // sequential generator. Skip occupied values rather than making the first
+    // post-load edit fail with DUPLICATE_ID.
+    let lastId = "";
+    for (let attempt = 0; attempt < 10_000; attempt += 1) {
+      lastId = ctx.ids.next();
+      if (ctx.village.hasEntityId(lastId)) continue;
+      const instance: BuildingInstance = {
+        id: brand<"Building">(lastId),
+        definitionId: this.#params.definitionId,
+        position: this.#params.position,
+        rotation: this.#params.rotation ?? 0,
+      };
+      const placed = ctx.village.placeBuilding(instance);
+      if (!placed.ok) return placed;
+      this.#instance = instance;
+      ctx.events.append({ type: "BuildingPlaced", building: instance });
+      return ok(undefined);
+    }
+    return err({ kind: "DUPLICATE_ID", id: lastId });
   }
 
   undo(ctx: CommandContext): void {

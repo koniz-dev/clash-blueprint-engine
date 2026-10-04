@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { BuildingCatalog, BuildingDefinition, GameRules, VillageEditor } from "@clash/engine";
 import { ValidationEngine, type RuleSet, type ValidationReport } from "@clash/rules-engine";
 import { recommendImprovements, type AiReport } from "@clash/ai";
@@ -22,12 +22,16 @@ export function useQueries(
   catalog: BuildingCatalog,
   rules: GameRules,
   ruleSet: RuleSet | undefined,
+  version: number,
   analyzeAsync: AnalyzeAsync | undefined,
   pushLog: PushLog,
 ) {
   const [validation, setValidation] = useState<ValidationReport | null>(null);
   const [ai, setAi] = useState<AiReport | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
+  const requestEpoch = useRef(0);
+  const versionRef = useRef(version);
+  versionRef.current = version;
 
   const runValidation = useCallback(() => {
     if (!ruleSet) {
@@ -52,6 +56,8 @@ export function useQueries(
     };
 
     if (analyzeAsync) {
+      const requestId = ++requestEpoch.current;
+      const startedVersion = versionRef.current;
       // Off-thread: the heavy attack simulations don't block the UI.
       setAiLoading(true);
       pushLog("info", "Running AI analysis…");
@@ -60,11 +66,15 @@ export function useQueries(
           snapshot: editor.village.toSnapshot(),
           definitions: [...catalog.all()],
         });
-        applyReport(report);
+        if (requestEpoch.current === requestId && versionRef.current === startedVersion) {
+          applyReport(report);
+        }
       } catch (error) {
-        pushLog("error", `AI failed: ${error instanceof Error ? error.message : String(error)}`);
+        if (requestEpoch.current === requestId) {
+          pushLog("error", `AI failed: ${error instanceof Error ? error.message : String(error)}`);
+        }
       } finally {
-        setAiLoading(false);
+        if (requestEpoch.current === requestId) setAiLoading(false);
       }
       return;
     }
@@ -76,8 +86,10 @@ export function useQueries(
   }, [editor, catalog, analyzeAsync, rules, pushLog]);
 
   const reset = useCallback(() => {
+    requestEpoch.current += 1;
     setValidation(null);
     setAi(null);
+    setAiLoading(false);
   }, []);
 
   return {

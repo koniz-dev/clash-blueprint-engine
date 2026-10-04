@@ -76,6 +76,11 @@ export class Village {
     return this.#walls.size;
   }
 
+  /** Whether an id is already used by either entity kind. */
+  hasEntityId(id: string): boolean {
+    return this.#buildings.has(id as BuildingId) || this.#walls.has(id as WallId);
+  }
+
   /** Id of whatever occupies a tile (building or wall), if anything. */
   occupantAt(pos: GridVec): string | undefined {
     return this.#index.occupantAt(pos);
@@ -93,7 +98,7 @@ export class Village {
   // --- Building mutations -------------------------------------------------
 
   placeBuilding(instance: BuildingInstance): Result<BuildingInstance, EngineError> {
-    if (this.#buildings.has(instance.id)) {
+    if (this.hasEntityId(instance.id)) {
       return err({ kind: "DUPLICATE_ID", id: instance.id });
     }
     const def = this.#catalog.get(instance.definitionId);
@@ -156,7 +161,7 @@ export class Village {
   // --- Wall mutations -----------------------------------------------------
 
   addWall(segment: WallSegment): Result<WallSegment, EngineError> {
-    if (this.#walls.has(segment.id)) {
+    if (this.hasEntityId(segment.id)) {
       return err({ kind: "DUPLICATE_ID", id: segment.id });
     }
     if (!this.grid.containsTile(segment.position)) {
@@ -193,6 +198,95 @@ export class Village {
     const next: WallSegment = { ...current, position };
     this.#walls.set(id, next);
     return ok(next);
+  }
+
+  /**
+   * Atomically transform a mixed set of buildings and walls. Destination
+   * occupancy is evaluated as a whole, with every moved entity removed from
+   * its old position, so adjacent selections can translate through one
+   * another's former cells.
+   */
+  transformEntities(
+    buildingTransforms: readonly {
+      readonly id: BuildingId;
+      readonly position: GridVec;
+      readonly rotation: Rotation;
+    }[],
+    wallTransforms: readonly { readonly id: WallId; readonly position: GridVec }[],
+  ): Result<void, EngineError> {
+    const movingIds = new Set<string>();
+    for (const { id } of [...buildingTransforms, ...wallTransforms]) {
+      if (movingIds.has(id)) return err({ kind: "DUPLICATE_ID", id });
+      movingIds.add(id);
+    }
+
+    const buildings: Array<{
+      current: BuildingInstance;
+      next: BuildingInstance;
+      currentFootprint: Footprint;
+      nextFootprint: Footprint;
+    }> = [];
+    for (const transform of buildingTransforms) {
+      const current = this.#buildings.get(transform.id);
+      if (!current) return err({ kind: "NOT_FOUND", id: transform.id });
+      const def = this.#catalog.get(current.definitionId);
+      if (!def) return err({ kind: "UNKNOWN_DEFINITION", definitionId: current.definitionId });
+      const nextFootprint = computeFootprint(def, transform.position, transform.rotation);
+      if (!this.grid.containsRect(nextFootprint.bounds)) {
+        return err({ kind: "OUT_OF_BOUNDS", bounds: nextFootprint.bounds });
+      }
+      buildings.push({
+        current,
+        next: { ...current, position: transform.position, rotation: transform.rotation },
+        currentFootprint: computeFootprint(def, current.position, current.rotation),
+        nextFootprint,
+      });
+    }
+
+    const walls: Array<{ current: WallSegment; next: WallSegment }> = [];
+    for (const transform of wallTransforms) {
+      const current = this.#walls.get(transform.id);
+      if (!current) return err({ kind: "NOT_FOUND", id: transform.id });
+      if (!this.grid.containsTile(transform.position)) {
+        return err({
+          kind: "OUT_OF_BOUNDS",
+          bounds: { x: transform.position.x, y: transform.position.y, width: 1, height: 1 },
+        });
+      }
+      walls.push({ current, next: { ...current, position: transform.position } });
+    }
+
+    const destinationOwners = new Map<string, string>();
+    const conflicts: GridVec[] = [];
+    const inspect = (id: string, cells: readonly GridVec[]): void => {
+      for (const cell of cells) {
+        const key = TileOccupancyIndex.key(cell.x, cell.y);
+        const destinationOwner = destinationOwners.get(key);
+        const currentOwner = this.#index.occupantAt(cell);
+        if (
+          (destinationOwner !== undefined && destinationOwner !== id) ||
+          (currentOwner !== undefined && !movingIds.has(currentOwner))
+        ) {
+          conflicts.push(cell);
+        }
+        destinationOwners.set(key, id);
+      }
+    };
+    for (const update of buildings) inspect(update.current.id, update.nextFootprint.cells);
+    for (const update of walls) inspect(update.current.id, [update.next.position]);
+    if (conflicts.length > 0) return err({ kind: "OVERLAP", cells: conflicts });
+
+    for (const update of buildings) this.#index.release(update.currentFootprint.cells);
+    for (const update of walls) this.#index.release([update.current.position]);
+    for (const update of buildings) {
+      this.#buildings.set(update.next.id, update.next);
+      this.#index.occupy(update.next.id, update.nextFootprint.cells);
+    }
+    for (const update of walls) {
+      this.#walls.set(update.next.id, update.next);
+      this.#index.occupy(update.next.id, [update.next.position]);
+    }
+    return ok(undefined);
   }
 
   removeWall(id: WallId): Result<WallSegment, EngineError> {

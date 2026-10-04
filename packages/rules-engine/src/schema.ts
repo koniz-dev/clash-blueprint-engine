@@ -30,7 +30,29 @@ export const buildingDefinitionSchema = z
     hitpoints: z.number().positive().optional(),
     damagePerSecond: z.number().nonnegative().optional(),
   })
-  .strict();
+  .strict()
+  .superRefine((definition, context) => {
+    if (!definition.hitbox) return;
+    const seen = new Set<string>();
+    definition.hitbox.forEach(([x, y], index) => {
+      if (x < 0 || y < 0 || x >= definition.width || y >= definition.height) {
+        context.addIssue({
+          code: "custom",
+          path: ["hitbox", index],
+          message: `cell (${x}, ${y}) must be inside ${definition.width}x${definition.height} bounds`,
+        });
+      }
+      const key = `${x},${y}`;
+      if (seen.has(key)) {
+        context.addIssue({
+          code: "custom",
+          path: ["hitbox", index],
+          message: `duplicate cell (${x}, ${y})`,
+        });
+      }
+      seen.add(key);
+    });
+  });
 
 export const buildingAllowanceSchema = z
   .object({

@@ -1,5 +1,5 @@
 import type { GridVec, Result } from "@clash/shared";
-import { brand, invariant, ok } from "@clash/shared";
+import { brand, err, invariant, ok } from "@clash/shared";
 import type { EngineError } from "../../domain/errors.js";
 import type { WallId, WallSegment } from "../../domain/wall.js";
 import type { Command, CommandContext } from "../command.js";
@@ -23,17 +23,28 @@ export class AddWallCommand implements Command {
   }
 
   execute(ctx: CommandContext): Result<void, EngineError> {
-    const segment: WallSegment = this.#segment ?? {
-      id: brand<"Wall">(ctx.ids.next()),
-      position: this.#params.position,
-    };
+    if (this.#segment) {
+      const added = ctx.village.addWall(this.#segment);
+      if (!added.ok) return added;
+      ctx.events.append({ type: "WallAdded", wall: this.#segment });
+      return ok(undefined);
+    }
 
-    const added = ctx.village.addWall(segment);
-    if (!added.ok) return added;
-
-    this.#segment = segment;
-    ctx.events.append({ type: "WallAdded", wall: segment });
-    return ok(undefined);
+    let lastId = "";
+    for (let attempt = 0; attempt < 10_000; attempt += 1) {
+      lastId = ctx.ids.next();
+      if (ctx.village.hasEntityId(lastId)) continue;
+      const segment: WallSegment = {
+        id: brand<"Wall">(lastId),
+        position: this.#params.position,
+      };
+      const added = ctx.village.addWall(segment);
+      if (!added.ok) return added;
+      this.#segment = segment;
+      ctx.events.append({ type: "WallAdded", wall: segment });
+      return ok(undefined);
+    }
+    return err({ kind: "DUPLICATE_ID", id: lastId });
   }
 
   undo(ctx: CommandContext): void {
