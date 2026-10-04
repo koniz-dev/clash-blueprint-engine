@@ -1,5 +1,5 @@
 import type { GridVec } from "@clash/shared";
-import { bench, describe } from "vitest";
+import { describe, test } from "vitest";
 import { aStar } from "./astar.js";
 import { computeFlowField } from "./flow-field.js";
 
@@ -14,29 +14,40 @@ const barrier = (t: GridVec): number => {
 };
 
 describe("pathfinding on a 44×44 grid", () => {
-  bench("A* corner-to-corner, open grid", () => {
-    aStar({
-      width: W,
-      height: H,
-      start: { x: 0, y: 0 },
-      isGoal: (t) => t.x === W - 1 && t.y === H - 1,
-      enterCost: () => 1,
-      heuristic: manhattan,
-    });
+  test("A* corner-to-corner, open grid", async ({ bench }) => {
+    await bench("A* corner-to-corner, open grid", () => {
+      aStar({
+        width: W,
+        height: H,
+        start: { x: 0, y: 0 },
+        isGoal: (t) => t.x === W - 1 && t.y === H - 1,
+        enterCost: () => 1,
+        heuristic: manhattan,
+      });
+    }).run();
   });
 
-  bench("A* corner-to-corner, weighted wall barrier", () => {
-    aStar({
-      width: W,
-      height: H,
-      start: { x: 0, y: 0 },
-      isGoal: (t) => t.x === W - 1 && t.y === H - 1,
-      enterCost: barrier,
-      heuristic: manhattan,
-    });
+  test("A* corner-to-corner, weighted wall barrier", async ({ bench }) => {
+    await bench("A* corner-to-corner, weighted wall barrier", () => {
+      aStar({
+        width: W,
+        height: H,
+        start: { x: 0, y: 0 },
+        isGoal: (t) => t.x === W - 1 && t.y === H - 1,
+        enterCost: barrier,
+        heuristic: manhattan,
+      });
+    }).run();
   });
 
-  bench("flow field for the whole grid (shared by a swarm)", () => {
-    computeFlowField({ width: W, height: H, goals: [{ x: W - 1, y: H - 1 }], enterCost: () => 1 });
+  test("flow field for the whole grid (shared by a swarm)", async ({ bench }) => {
+    await bench("flow field for the whole grid (shared by a swarm)", () => {
+      computeFlowField({
+        width: W,
+        height: H,
+        goals: [{ x: W - 1, y: H - 1 }],
+        enterCost: () => 1,
+      });
+    }).run();
   });
 });

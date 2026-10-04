@@ -1,5 +1,5 @@
 import { createSequentialIdGenerator } from "@clash/shared";
-import { bench, describe } from "vitest";
+import { describe, test } from "vitest";
 import { InMemoryBuildingCatalog, VillageEditor } from "./index.js";
 
 const catalog = new InMemoryBuildingCatalog([
@@ -19,24 +19,30 @@ function packedVillage(target: number): VillageEditor {
 }
 
 describe("spatial index", () => {
-  bench("place 1000 buildings on a 48×48 grid", () => {
-    packedVillage(1000);
+  test("place 1000 buildings on a 48×48 grid", async ({ bench }) => {
+    await bench("place 1000 buildings on a 48×48 grid", () => {
+      packedVillage(1000);
+    }).run();
   });
 
-  bench("100k occupancy queries on a full grid", () => {
-    const editor = packedVillage(1000);
-    for (let i = 0; i < 100_000; i++) {
-      editor.village.occupantAt({ x: i % 48, y: (i >> 6) % 48 });
-    }
+  test("100k occupancy queries on a full grid", async ({ bench }) => {
+    await bench("100k occupancy queries on a full grid", () => {
+      const editor = packedVillage(1000);
+      for (let i = 0; i < 100_000; i++) {
+        editor.village.occupantAt({ x: i % 48, y: (i >> 6) % 48 });
+      }
+    }).run();
   });
 });
 
 describe("overlap checks", () => {
-  bench("1000 overlap-rejected placements (3×3)", () => {
-    const editor = VillageEditor.forGridSize(48, catalog, 1, createSequentialIdGenerator("o"));
-    editor.addBuilding("big", { x: 10, y: 10 });
-    for (let i = 0; i < 1000; i++) {
-      editor.addBuilding("big", { x: 11, y: 11 }); // always overlaps → rejected
-    }
+  test("1000 overlap-rejected placements (3×3)", async ({ bench }) => {
+    await bench("1000 overlap-rejected placements (3×3)", () => {
+      const editor = VillageEditor.forGridSize(48, catalog, 1, createSequentialIdGenerator("o"));
+      editor.addBuilding("big", { x: 10, y: 10 });
+      for (let i = 0; i < 1000; i++) {
+        editor.addBuilding("big", { x: 11, y: 11 }); // always overlaps → rejected
+      }
+    }).run();
   });
 });
